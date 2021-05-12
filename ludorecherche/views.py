@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 
 
 from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Background, Topic,\
-    Mechanism
+    Mechanism, Theme
 from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
 from ludogestion.views import base
@@ -90,6 +90,35 @@ def add_on_detail(request, add_on_pk):
 
 
 def lucky(request):
+    list_of_theme = [
+        ('Pathfinder', 'MedievalSharp, cursive', 'https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap',
+         'back_pathfinder.jpg', 'pathfinder_404.jpg', "Il n'y a rien ici", 'Tentez une autre quête',
+         'pathfinder_500.jpg', 'Un évènement mystérieux a interrompu le déroulement de votre quête',
+         "Seule votre persévérance permettra l'accomplissement de votre tâche", 'La salle des Trésors',
+         'Bienvenue!', 'Vos derniers trésors:', 'Notre boule de cristal est à votre service',
+         'Lancer la divination', 'la quête', 'Ce trésor est bien vide...', 'pathfinder_empty_request.jpg',
+         '#5F939A', '#D8AC9C', '#EAC8AF', '#1B2021', '#5F939A'),
+        (
+        'Marvel', 'Karantina,cursive', 'https://fonts.googleapis.com / css2?family=Karantina:wght @ 300 & display=swap',
+        'marvel_background.jpg', 'marvel_404.jpg', 'Personne ici', 'Retourner chasser le crime ailleurs.',
+        'marvel_500.jpg',
+        'Le cérébro à un problème', 'Attendez un moment pendant que nousle réparons.', "L'arsenal", 'Welcome Avenger!',
+        'Voici nos dernières découvertes:', 'Le crime ne dort jamais, querecherchez vous?', 'Utiliser vos super-sens',
+        'la patrouille', 'Cette ville est bien vide...', 'marvel_empty_street.jpg', '  # D8E3E7', '#51C4D3', '#126E82',
+        '#132C33', '#D8E3E7')]
+    games = Game.objects.all()
+
+    for theme in list_of_theme:
+        Theme.objects.create(name=theme[0], font_name=theme[2], font_link=theme[3], background_image=theme[4],
+                             image_404=theme[5],
+                             title_404=theme[6], text_404=theme[7], image_500=theme[8], title_500=theme[9],
+                             text_500=theme[10],
+                             list_all_title=theme[11], index_title=theme[12], index_text=theme[13],
+                             advanced_search_title=theme[14],
+                             advanced_search_button_text=theme[15], query_name=theme[16], empty_query_text=theme[17],
+                             empty_query_image=theme[18], color_main=theme[19], color_2nd=theme[20],
+                             color_3rd=theme[21],
+                             color_4th=theme[22], color_back=theme[23])
     games = Game.objects.all()
     game = games[randint(0, len(games) - 1)]
     return detail(request, game.pk)
