@@ -18,9 +18,9 @@ def base(request):  # give the basic context of each page
     form = LogInForm()
     if request.user.is_authenticated:
         authentified = True
-    #interface = Background.objects.get(name='Interface')
+    interface = Background.objects.get(name='Interface')
     context = {
-        #'interface': interface,
+        'interface': interface,
         'authentified': authentified,
         'form': form,
     }
