@@ -24,11 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 FIL_ROUGE = os.environ['FIL_ROUGE']
 FIL_ROUGE_DB_USER = os.environ['FIL_ROUGE_DB_USER']
 FIL_ROUGE_DB_PASSWORD = os.environ['FIL_ROUGE_DB_PASSWORD']
+fil_rouge_env = os.environ['fil_rouge_env']
 SECRET_KEY = FIL_ROUGE
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+if fil_rouge_env == 'dev_phase':
+    DEBUG = True
+else:
+    DEBUG = False
+    
 ALLOWED_HOSTS = ['https://fil-rouge-fad-dev-310121ja.herokuapp.com/']
 
 
