@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'ludo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',  # on utilise l'adaptateur postgresql
-        'NAME': 'fil_rouge_3',  # le nom de notre base de donnees creee precedemment
+        'NAME': 'fil_rouge',  # le nom de notre base de donnees creee precedemment
         'USER': FIL_ROUGE_DB_USER,  # attention : remplacez par votre nom d'utilisateur
         'PASSWORD': FIL_ROUGE_DB_PASSWORD,
         'HOST': '',

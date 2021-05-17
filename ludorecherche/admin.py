@@ -101,7 +101,7 @@ class ArtistMultiAddOnInline(admin.TabularInline):
 class ArtistAdmin(admin.ModelAdmin):
     search_fields = ['name']
     inlines = [ArtistAddOnInline, ArtistMultiAddOnInline, ArtistGameInline, ]
-    list_display = ('name',)
+    list_display = ('name')
     ordering = ['name']
 
 
