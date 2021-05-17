@@ -27,7 +27,7 @@ FIL_ROUGE_DB_PASSWORD = os.environ['FIL_ROUGE_DB_PASSWORD']
 SECRET_KEY = FIL_ROUGE
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['https://fil-rouge-fad-dev-310121ja.herokuapp.com/']
 

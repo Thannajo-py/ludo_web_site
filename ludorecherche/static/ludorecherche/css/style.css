@@ -37,6 +37,13 @@ nav > input{
     width:60%;
 }
 
+h3 {
+    font-size:30px;
+}
+a > h3 {
+    font-size: 25px;
+}
+
 h1,h2{
     font-size:6em;
     margin-top:5%;
@@ -123,9 +130,6 @@ td{
 
 }
 
-h3{
-    font-size: 1.5em;
-}
 
 a{
     font-size: 30px;
