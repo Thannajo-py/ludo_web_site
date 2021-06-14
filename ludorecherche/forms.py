@@ -1,4 +1,4 @@
-"""from django import forms
+from django import forms
 
 
 from.models import Language, PlayingMode, Difficulty, Tag, Mechanism, Topic
@@ -31,4 +31,3 @@ class SearchAdvForm(forms.Form):  # form used in advanced search
                                                     choices=TOPIC_CHOICES)
     mechanism = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'select'}),
                                                     choices=MECHANISM_CHOICES)
-"""

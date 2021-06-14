@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Background, Topic,\
     Mechanism, Theme
 from ludoaccueil.models import Comment
-"""from .forms import SearchAdvForm"""
+from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
 from ludogestion.views import base
 from ludoaccueil.forms import CommentForm
@@ -109,7 +109,7 @@ def lucky(request):
 
 def search_page(request):
     context = base(request)
-    search_form = """SearchAdvForm(request.GET)"""
+    search_form = SearchAdvForm(request.GET)
     context.update({
         'search_form': search_form,
     })
@@ -221,7 +221,7 @@ def get_data_or_default(expression, value, default_value):  # check if field is 
 
 def advanced_search(request):  # search through database for specific games with multifactorial criteria
     context = base(request)
-    form = """SearchAdvForm(request.GET)"""
+    form = SearchAdvForm(request.GET)
     language = get_data_list_or_default(form.data.getlist, 'language', [])
     query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
     difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])
