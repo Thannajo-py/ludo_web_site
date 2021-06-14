@@ -66,7 +66,7 @@ def post_comment(request, type_id, type_name):
         title = request.POST['title']
         content = request.POST['content']
         user = request.user
-        comment = Comment.objects.create(title=title, content=content, author=user)
+        comment = Comment.objects.create(title=title, text_content=content, author=user)
         if type_name == 'game':
             comment.game_id = type_id
             comment.save()

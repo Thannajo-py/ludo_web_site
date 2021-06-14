@@ -198,7 +198,7 @@
         {% for comment in comments %}
             <h3 class="comment">{{comment.title}}</h3>
             <p>{{ comment.author.first_name }} {{ comment.author.last_name }}</p>
-            <p>{{ comment.content }}</p>
+            <p>{{ comment.text_content }}</p>
         {% endfor %}
             <form class="comment" action="{% url 'ludoaccueil:post_comment' type_id=variable.id type_name=type %}" method="POST">
                 {% csrf_token %}

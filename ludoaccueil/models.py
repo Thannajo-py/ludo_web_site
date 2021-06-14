@@ -24,7 +24,7 @@ class News(models.Model):  # Database table for storing article for presentation
 
 class Comment(models.Model): # Database table for storing user comment
     title = models.CharField("titre", max_length=200, null=True, blank=True)
-    content = models.TextField("commentaire", null=True, blank=True)
+    text_content = models.TextField("commentaire", null=True, blank=True)
     created_at = models.DateTimeField('date de création', auto_now_add=True)
     author = models.ForeignKey(User, verbose_name='auteur', on_delete=models.DO_NOTHING, null=True, blank=True)
     news = models.ForeignKey(News, verbose_name='nouvelles', on_delete=models.CASCADE, null=True, blank=True)
