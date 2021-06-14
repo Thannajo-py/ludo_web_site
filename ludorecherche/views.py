@@ -95,7 +95,7 @@ def add_on_detail(request, add_on_pk):
         'playing_modes': playing_modes,
         'link_game': game,
         'type': 'add_on',
-        'form':form,
+        'form': form,
         'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
