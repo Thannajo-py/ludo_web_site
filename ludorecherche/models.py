@@ -76,9 +76,6 @@ class Publisher(models.Model):
         return self.name
 
 
-
-
-
 class PlayingMode(models.Model):
     name = models.CharField('nom', max_length=200, unique=True)
 
@@ -88,6 +85,7 @@ class PlayingMode(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Language(models.Model):
     name = models.CharField('nom', max_length=200, unique=True)
@@ -107,7 +105,7 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
     playing_time = models.CharField('durée de jeu', max_length=50, null=True, blank=True)
     created_at = models.DateTimeField('date de création', auto_now_add=True)
     difficulty = models.ForeignKey(Difficulty, verbose_name='difficulté',
-                                   on_delete=models.CASCADE, null=True, blank=True)
+                                   on_delete=models.DO_NOTHING, null=True, blank=True)
     picture = models.TextField("URL interne de l'image", blank=True, null=True)
     external_image = models.TextField("URL externe de l'image", blank=True, null=True)
     thumb_image = models.TextField("URL externe de l'image de petite taille", blank=True, null=True)
@@ -116,8 +114,7 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
     publishers = models.ManyToManyField(Publisher, verbose_name='éditeur', blank=True)
     bgg_link = models.TextField("URL de BGG ou Tric Trac ", blank=True)
     playing_mode = models.ManyToManyField(PlayingMode, verbose_name='type', blank=True)
-    language = models.ForeignKey(Language, verbose_name='langue', on_delete=models.CASCADE,
-                                 null=True, blank=True)
+    language = models.ManyToManyField(Language, verbose_name='langue', blank=True)
     age = models.IntegerField('âge', blank=True, null=True)
     buying_price = models.IntegerField("prix d'achat", null=True, blank=True)
     stock = models.IntegerField("Quantité", default=1)

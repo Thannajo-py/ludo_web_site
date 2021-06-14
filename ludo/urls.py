@@ -30,6 +30,7 @@ urlpatterns = [
     path('gm/', admin.site.urls),  # admin url adress
     path('ludorecherche/', include('ludorecherche.urls', namespace='ludorecherche')),  # url search include app url
     path('ludogestion/', include('ludogestion.urls', namespace='ludogestion')),  # url search include app url
+    path('ludoaccueil/', include('ludoaccueil.urls', namespace='ludoaccueil')),  # url search include app url
     path('', view.accueil, name='accueil'),  # handle the presentation page with ludoaccueil app
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

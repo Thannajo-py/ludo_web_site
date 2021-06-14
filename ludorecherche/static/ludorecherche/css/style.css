@@ -198,6 +198,15 @@ input[type='checkbox']{
 
 }
 
+.text_area{
+    height: 20vh;
+    margin-bottom: 3%;
+}
+.text_area > textarea{
+    height:100%;
+    width:90%;
+}
+
 #red_stripe{
     color: red;
 }

@@ -4,11 +4,14 @@ import time
 
 
 from django.shortcuts import render
+from django.db import transaction
+from django.contrib.auth.decorators import login_required
 
 
 from ludorecherche.models import Game, Background
+from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 from ludogestion.views import base
-from .models import News
+from .models import News, Comment
 
 
 last_update = 0
@@ -22,13 +25,16 @@ class ShowItems:  # models for Game Board Atlas data
 
 
 def news(request): # handle API Game Board Atlas requests
-    selected = requests.get(
-        f'https://api.boardgameatlas.com/api/search?{request}&client_id=JLBr5npPhV'
-    )
-    selected = json.loads(selected.text)
-    selected = selected['games']
-    selected = [ShowItems(game['name'], game['image_url'], game['url']) for game in selected]
-    return selected
+    try:
+        selected = requests.get(
+            f'https://api.boardgameatlas.com/api/search?{request}&client_id=JLBr5npPhV'
+        )
+        selected = json.loads(selected.text)
+        selected = selected['games']
+        selected = [ShowItems(game['name'], game['image_url'], game['url']) for game in selected]
+        return selected
+    except:
+        return []
 
 
 def accueil(request):  # Build the presentation page and send it back
@@ -50,6 +56,33 @@ def accueil(request):  # Build the presentation page and send it back
         'articles': articles,
     })
     return render(request, 'ludoaccueil/accueil.html', context)
+
+
+@transaction.atomic
+@login_required
+def post_comment(request, type_id, type_name):
+    context = base(request)
+    if request.method == "POST":
+        title = request.POST['title']
+        content = request.POST['content']
+        user = request.user
+        comment = Comment.objects.create(title=title, content=content, author=user)
+        if type_name == 'game':
+            comment.game_id = type_id
+            comment.save()
+            return detail(request, type_id)
+        elif type_name == 'add_on':
+            comment.add_on_id = type_id
+            comment.save()
+            return detail(request, type_id)
+        elif type_name == 'multi_add_on':
+            comment.multi_add_on_id = type_id
+            comment.save()
+            return detail(request, type_id)
+        else:
+            comment.news_id = type_id
+            comment.save()
+        return accueil(request)
 
 
 

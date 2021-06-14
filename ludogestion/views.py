@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 
 from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn
@@ -27,13 +27,13 @@ def base(request):  # give the basic context of each page
     return context
 
 
-@login_required  # decorator checking if user is log sending it back to login_failed page if not
+@permission_required('ludorecherche.add_game') # decorator checking if user have right to add game
 def find_a_game_page(request):  # base page for adding a game
     context = base(request)
     return render(request, 'ludogestion/find_a_game.html', context)
 
 
-@login_required  # decorator checking if user is log sending it back to login_failed page if not
+@permission_required('ludorecherche.add_game') # decorator checking if user have right to add game
 def retrieve_game_from_api(request):  # build the answer API BGA page
     context = base(request)
 
@@ -54,7 +54,7 @@ def retrieve_game_from_api(request):  # build the answer API BGA page
     return render(request, 'ludogestion/find_a_game.html', context)
 
 
-@login_required  # decorator checking if user is log sending it back to login_failed page if not
+@permission_required('ludorecherche.add_game') # decorator checking if user have right to add game
 @transaction.atomic  # ensure all the register go well or cancel change in database
 def add_a_game(request, game_id):  # Register selected game from page to database if not present
     context = base(request)

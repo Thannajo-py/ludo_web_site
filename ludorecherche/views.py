@@ -5,9 +5,11 @@ from django.shortcuts import render, get_object_or_404
 
 from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Background, Topic,\
     Mechanism, Theme
+from ludoaccueil.models import Comment
 from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
 from ludogestion.views import base
+from ludoaccueil.forms import CommentForm
 
 
 # Create your views here.
@@ -31,6 +33,7 @@ def list_all(request):
 
 def detail(request, game_pk):  # Game detail
     context = base(request)
+    form = CommentForm()
     game = get_object_or_404(Game, pk=game_pk)
     add_ons = AddOn.objects.filter(game__name__icontains=game.name)
     multi_add_ons = MultiAddOn.objects.filter(games__name__icontains=game.name)
@@ -41,6 +44,7 @@ def detail(request, game_pk):  # Game detail
     tags = [tag for tag in game.tag.all()]
     topics = [topic for topic in game.topic.all()]
     mechanisms = [mechanism for mechanism in game.mechanism.all()]
+    comments = Comment.objects.filter(game__name__icontains=game.name)
     # give the difficulty symbol his color
     if game.difficulty:
         color = 'green' if game.difficulty.name.lower() in ['famille', 'ambiance'] \
@@ -59,6 +63,9 @@ def detail(request, game_pk):  # Game detail
         'mechanisms': mechanisms,
         'topics': topics,
         'multi_add_ons': multi_add_ons,
+        'comments': comments,
+        'form': form,
+        'type': 'game',
     })
     return render(request, 'ludorecherche/detail.html', context)
 

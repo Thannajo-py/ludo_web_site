@@ -32,7 +32,7 @@ if fil_rouge_env == 'dev_phase':
     DEBUG = True
 else:
     DEBUG = False
-    
+
 ALLOWED_HOSTS = ['https://fil-rouge-fad-dev-310121ja.herokuapp.com/']
 
 
