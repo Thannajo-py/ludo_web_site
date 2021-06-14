@@ -12,6 +12,7 @@ from ludorecherche.models import Game, Background
 from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 from ludogestion.views import base
 from .models import News, Comment
+from .forms import CommentForm
 
 
 last_update = 0
@@ -40,6 +41,7 @@ def news(request): # handle API Game Board Atlas requests
 def accueil(request):  # Build the presentation page and send it back
     global last_update, last_news, last_kickstarters, most_popular
     context = base(request)
+    form = CommentForm
     last_games = Game.objects.order_by('-created_at')[:5]
     articles = News.objects.all()
     actual_time = time.time()
@@ -54,6 +56,8 @@ def accueil(request):  # Build the presentation page and send it back
         'last_games': last_games,
         'most_popular': most_popular,
         'articles': articles,
+        'type':'news',
+        'form': form,
     })
     return render(request, 'ludoaccueil/accueil.html', context)
 
@@ -74,11 +78,11 @@ def post_comment(request, type_id, type_name):
         elif type_name == 'add_on':
             comment.add_on_id = type_id
             comment.save()
-            return detail(request, type_id)
+            return add_on_detail(request, type_id)
         elif type_name == 'multi_add_on':
             comment.multi_add_on_id = type_id
             comment.save()
-            return detail(request, type_id)
+            return multi_add_on_detail(request, type_id)
         else:
             comment.news_id = type_id
             comment.save()

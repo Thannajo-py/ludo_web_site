@@ -72,12 +72,14 @@ def detail(request, game_pk):  # Game detail
 
 def add_on_detail(request, add_on_pk):
     context = base(request)
+    form = CommentForm()
     add_on = get_object_or_404(AddOn, pk=add_on_pk)
     artists = [artist for artist in add_on.artists.all()]
     designers = [designer for designer in add_on.designers.all()]
     publishers = [publisher for publisher in add_on.publishers.all()]
     playing_modes = [playing_mode for playing_mode in add_on.playing_mode.all()]
     game = add_on.game
+    comments = Comment.objects.filter(add_on__name__icontains=add_on.name)
     # give the difficulty symbol his color
     if add_on.difficulty:
         color = 'green' if add_on.difficulty.name.lower() in ['famille', 'ambiance'] else 'orange'\
@@ -92,6 +94,9 @@ def add_on_detail(request, add_on_pk):
         'color': color,
         'playing_modes': playing_modes,
         'link_game': game,
+        'type': 'add_on',
+        'form':form,
+        'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
 
@@ -145,12 +150,14 @@ def search(request):  # handle basic nav search
             kinds = " ".join([kind.name.lower() for kind in game.playing_mode.all()])
             tags = " ".join([tag.name.lower() for tag in game.tag.all()])
             minimum_player, maximum_player = extend_number_of_player(game)
+
             if query.isnumeric() and minimum_player <= int(query) <= maximum_player:
                 games += [game]
                 continue
+            print(game.language.name)
             # check if the game correspond to any of the criteria:
             if query.lower() in game.name.lower()\
-                    or game.language and query.lower() in game.language.name.lower()\
+                    or game.language.name != None  and query.lower() in game.language.name.lower()\
                     or query.lower() in kinds\
                     or game.difficulty and query.lower() in game.difficulty.name.lower()\
                     or game.tag and query.lower() in tags\
@@ -261,12 +268,14 @@ def advanced_search(request):  # search through database for specific games with
 
 def multi_add_on_detail(request, multi_add_on_pk):
     context = base(request)
+    form = CommentForm()
     multi_add_on = get_object_or_404(MultiAddOn, pk=multi_add_on_pk)
     artists = [artist for artist in multi_add_on.artists.all()]
     designers = [designer for designer in multi_add_on.designers.all()]
     publishers = [publisher for publisher in multi_add_on.publishers.all()]
     playing_modes = [playing_mode for playing_mode in multi_add_on.playing_mode.all()]
     games = [game for game in multi_add_on.games.all()]
+    comments = Comment.objects.filter(multi_add_on__name__icontains=multi_add_on.name)
     # give the difficulty symbol his color
     if multi_add_on.difficulty:
         color = 'green' if multi_add_on.difficulty.name.lower() in ['famille', 'ambiance'] \
@@ -281,6 +290,9 @@ def multi_add_on_detail(request, multi_add_on_pk):
         'color': color,
         'playing_modes': playing_modes,
         'games': games,
+        'type': 'multi_add_on',
+        'form': form,
+        'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
 
