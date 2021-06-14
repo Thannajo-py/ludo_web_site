@@ -44,7 +44,7 @@ def detail(request, game_pk):  # Game detail
     tags = [tag for tag in game.tag.all()]
     topics = [topic for topic in game.topic.all()]
     mechanisms = [mechanism for mechanism in game.mechanism.all()]
-    #comments = Comment.objects.filter(game__name__icontains=game.name)
+    comments = Comment.objects.filter(game__name__icontains=game.name)
     # give the difficulty symbol his color
     if game.difficulty:
         color = 'green' if game.difficulty.name.lower() in ['famille', 'ambiance'] \
@@ -63,7 +63,7 @@ def detail(request, game_pk):  # Game detail
         'mechanisms': mechanisms,
         'topics': topics,
         'multi_add_ons': multi_add_ons,
-        #'comments': comments,
+        'comments': comments,
         'form': form,
         'type': 'game',
     })
