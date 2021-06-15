@@ -200,6 +200,7 @@
             <p>{{ comment.author.first_name }} {{ comment.author.last_name }}</p>
             <p>{{ comment.text_content }}</p>
         {% endfor %}
+        {% if authentified %}
             <form class="comment" action="{% url 'ludoaccueil:post_comment' type_id=variable.id type_name=type %}" method="POST">
                 {% csrf_token %}
                 <h3><label for="{{ form.title.id_for_label }}">titre</label></h3>
@@ -209,6 +210,7 @@
                             <div><button type="submit">Post Comment</button></div>
 
             </form>
+        {% endif %}
         </div>
 
     </div>
