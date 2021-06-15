@@ -32,6 +32,7 @@
             <a href="{{game.bgg_link}}">{{game.name}}</a></div></li>
     {% endfor %}
 </ul>
+    {% if articles %}
 <ul class="article" id="news">
     <li>
         {% for article in articles %}
@@ -66,7 +67,7 @@
             <p>{{article.content}}</p>
             {% endif %}
             {% if authentified %}
-            <form class="comment" action="{% url 'ludoaccueil:post_comment' type_id=variable.id type_name=type %}" method="POST">
+            <form class="comment" action="{% url 'ludoaccueil:post_comment' type_id=article.id type_name=type %}" method="POST">
                 {% csrf_token %}
                 <h3><label for="{{ form.title.id_for_label }}">titre</label></h3>
                     {{ form.title }}
@@ -79,4 +80,5 @@
         {% endfor %}
     </li>
 </ul>
+    {% endif %}
 {% endblock %}
