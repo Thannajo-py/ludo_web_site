@@ -65,6 +65,17 @@
             <h3 class="center">{{article.title}}</h3>
             <p>{{article.content}}</p>
             {% endif %}
+            {% if authentified %}
+            <form class="comment" action="{% url 'ludoaccueil:post_comment' type_id=variable.id type_name=type %}" method="POST">
+                {% csrf_token %}
+                <h3><label for="{{ form.title.id_for_label }}">titre</label></h3>
+                    {{ form.title }}
+                <h3><label for="{{ form.content.id_for_label }}">Contenu</label></h3>
+                <div class="text_area">{{ form.content }}</div>
+                            <div><button type="submit">Post Comment</button></div>
+
+            </form>
+            {% endif %}
         {% endfor %}
     </li>
 </ul>
