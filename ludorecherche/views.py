@@ -33,7 +33,7 @@ def list_all(request):
 
 def detail(request, game_pk):  # Game detail
     context = base(request)
-    form = CommentForm()
+    form_comment = CommentForm()
     game = get_object_or_404(Game, pk=game_pk)
     add_ons = AddOn.objects.filter(game__name__icontains=game.name)
     multi_add_ons = MultiAddOn.objects.filter(games__name__icontains=game.name)
@@ -64,7 +64,7 @@ def detail(request, game_pk):  # Game detail
         'topics': topics,
         'multi_add_ons': multi_add_ons,
         'comments': comments,
-        'form': form,
+        'form_comment': form_comment,
         'type': 'game',
     })
     return render(request, 'ludorecherche/detail.html', context)
@@ -72,7 +72,7 @@ def detail(request, game_pk):  # Game detail
 
 def add_on_detail(request, add_on_pk):
     context = base(request)
-    form = CommentForm()
+    form_comment = CommentForm()
     add_on = get_object_or_404(AddOn, pk=add_on_pk)
     artists = [artist for artist in add_on.artists.all()]
     designers = [designer for designer in add_on.designers.all()]
@@ -95,7 +95,7 @@ def add_on_detail(request, add_on_pk):
         'playing_modes': playing_modes,
         'link_game': game,
         'type': 'add_on',
-        'form': form,
+        'form_comment': form_comment,
         'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
@@ -268,7 +268,7 @@ def advanced_search(request):  # search through database for specific games with
 
 def multi_add_on_detail(request, multi_add_on_pk):
     context = base(request)
-    form = CommentForm()
+    form_comment = CommentForm()
     multi_add_on = get_object_or_404(MultiAddOn, pk=multi_add_on_pk)
     artists = [artist for artist in multi_add_on.artists.all()]
     designers = [designer for designer in multi_add_on.designers.all()]
@@ -291,7 +291,7 @@ def multi_add_on_detail(request, multi_add_on_pk):
         'playing_modes': playing_modes,
         'games': games,
         'type': 'multi_add_on',
-        'form': form,
+        'form_comment': form_comment,
         'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
