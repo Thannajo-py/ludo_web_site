@@ -41,7 +41,7 @@ def news(request): # handle API Game Board Atlas requests
 def accueil(request):  # Build the presentation page and send it back
     global last_update, last_news, last_kickstarters, most_popular
     context = base(request)
-    form = CommentForm()
+    form_comment = CommentForm()
     last_games = Game.objects.order_by('-created_at')[:5]
     articles = News.objects.all()
     actual_time = time.time()
@@ -57,7 +57,7 @@ def accueil(request):  # Build the presentation page and send it back
         'most_popular': most_popular,
         'articles': articles,
         'type': 'news',
-        'form': form,
+        'form_comment': form_comment,
     })
     return render(request, 'ludoaccueil/accueil.html', context)
 
