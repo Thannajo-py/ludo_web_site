@@ -3,8 +3,8 @@ from random import randint
 from django.shortcuts import render, get_object_or_404
 
 
-from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Background, Topic,\
-    Mechanism, Theme
+from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Topic,\
+    Mechanism, Language
 from ludoaccueil.models import Comment
 from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
@@ -31,19 +31,37 @@ def list_all(request):
     return render(request, 'ludorecherche/list_all.html', context)
 
 
+def common_detail(variable, context):
+    form_comment = CommentForm()
+    multi_add_ons = [multi_add_on for multi_add_on in variable.multi_add_ons.all()]
+    artists = [artist for artist in variable.artists.all()]
+    designers = [designer for designer in variable.designers.all()]
+    publishers = [publisher for publisher in variable.publishers.all()]
+    languages = [language for language in variable.language.all()]
+    playing_modes = [playing_mode for playing_mode in variable.playing_mode.all()]
+    tags = [tag for tag in variable.tag.all()]
+    topics = [topic for topic in variable.topic.all()]
+    mechanisms = [mechanism for mechanism in variable.mechanism.all()]
+    context.update({
+        'designers': designers,
+        'artists': artists,
+        'publishers': publishers,
+        'playing_modes': playing_modes,
+        'tags': tags,
+        'mechanisms': mechanisms,
+        'topics': topics,
+        'multi_add_ons': multi_add_ons,
+        'languages': languages,
+        'form_comment': form_comment,
+    })
+    return context
+
+
 def detail(request, game_pk):  # Game detail
     context = base(request)
-    form_comment = CommentForm()
     game = get_object_or_404(Game, pk=game_pk)
+    context = common_detail(game, context)
     add_ons = AddOn.objects.filter(game__name__icontains=game.name)
-    multi_add_ons = MultiAddOn.objects.filter(games__name__icontains=game.name)
-    artists = [artist for artist in game.artists.all()]
-    designers = [designer for designer in game.designers.all()]
-    publishers = [publisher for publisher in game.publishers.all()]
-    playing_modes = [playing_mode for playing_mode in game.playing_mode.all()]
-    tags = [tag for tag in game.tag.all()]
-    topics = [topic for topic in game.topic.all()]
-    mechanisms = [mechanism for mechanism in game.mechanism.all()]
     comments = Comment.objects.filter(game__name__icontains=game.name)
     # give the difficulty symbol his color
     if game.difficulty:
@@ -53,18 +71,9 @@ def detail(request, game_pk):  # Game detail
         color = 'blue'
     context.update({
         'variable': game,
-        'designers': designers,
-        'artists': artists,
-        'publishers': publishers,
         'color': color,
         'add_ons': add_ons,
-        'playing_modes': playing_modes,
-        'tags': tags,
-        'mechanisms': mechanisms,
-        'topics': topics,
-        'multi_add_ons': multi_add_ons,
         'comments': comments,
-        'form_comment': form_comment,
         'type': 'game',
     })
     return render(request, 'ludorecherche/detail.html', context)
@@ -72,12 +81,8 @@ def detail(request, game_pk):  # Game detail
 
 def add_on_detail(request, add_on_pk):
     context = base(request)
-    form_comment = CommentForm()
     add_on = get_object_or_404(AddOn, pk=add_on_pk)
-    artists = [artist for artist in add_on.artists.all()]
-    designers = [designer for designer in add_on.designers.all()]
-    publishers = [publisher for publisher in add_on.publishers.all()]
-    playing_modes = [playing_mode for playing_mode in add_on.playing_mode.all()]
+    context = common_detail(add_on, context)
     game = add_on.game
     comments = Comment.objects.filter(add_on__name__icontains=add_on.name)
     # give the difficulty symbol his color
@@ -88,14 +93,9 @@ def add_on_detail(request, add_on_pk):
         color = 'blue'
     context.update({
         'variable': add_on,
-        'designers': designers,
-        'artists': artists,
-        'publishers': publishers,
         'color': color,
-        'playing_modes': playing_modes,
         'link_game': game,
         'type': 'add_on',
-        'form_comment': form_comment,
         'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
@@ -103,6 +103,10 @@ def add_on_detail(request, add_on_pk):
 
 def lucky(request):
     games = Game.objects.all()
+    language = Language.objects.get(pk=1)
+    for game in games:
+        game.language.add(language)
+        game.save()
     game = games[randint(0, len(games) - 1)]
     return detail(request, game.pk)
 
@@ -268,12 +272,8 @@ def advanced_search(request):  # search through database for specific games with
 
 def multi_add_on_detail(request, multi_add_on_pk):
     context = base(request)
-    form_comment = CommentForm()
     multi_add_on = get_object_or_404(MultiAddOn, pk=multi_add_on_pk)
-    artists = [artist for artist in multi_add_on.artists.all()]
-    designers = [designer for designer in multi_add_on.designers.all()]
-    publishers = [publisher for publisher in multi_add_on.publishers.all()]
-    playing_modes = [playing_mode for playing_mode in multi_add_on.playing_mode.all()]
+    context = common_detail(multi_add_on, context)
     games = [game for game in multi_add_on.games.all()]
     comments = Comment.objects.filter(multi_add_on__name__icontains=multi_add_on.name)
     # give the difficulty symbol his color
@@ -284,14 +284,9 @@ def multi_add_on_detail(request, multi_add_on_pk):
         color = 'blue'
     context.update({
         'variable': multi_add_on,
-        'designers': designers,
-        'artists': artists,
-        'publishers': publishers,
         'color': color,
-        'playing_modes': playing_modes,
         'games': games,
         'type': 'multi_add_on',
-        'form_comment': form_comment,
         'comments': comments,
     })
     return render(request, 'ludorecherche/detail.html', context)
