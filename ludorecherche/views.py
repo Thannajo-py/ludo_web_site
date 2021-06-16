@@ -103,10 +103,6 @@ def add_on_detail(request, add_on_pk):
 
 def lucky(request):
     games = Game.objects.all()
-    language = Language.objects.get(pk=1)
-    for game in games:
-        game.language.add(language)
-        game.save()
     game = games[randint(0, len(games) - 1)]
     return detail(request, game.pk)
 
@@ -158,7 +154,6 @@ def search(request):  # handle basic nav search
             if query.isnumeric() and minimum_player <= int(query) <= maximum_player:
                 games += [game]
                 continue
-            print(game.language.name)
             # check if the game correspond to any of the criteria:
             if query.lower() in game.name.lower()\
                     or game.language.name != None  and query.lower() in game.language.name.lower()\
@@ -226,7 +221,7 @@ def get_data_or_default(expression, value, default_value):  # check if field is 
 def advanced_search(request):  # search through database for specific games with multifactorial criteria
     context = base(request)
     form = SearchAdvForm(request.GET)
-    language = get_data_list_or_default(form.data.getlist, 'language', [])
+    language = get_data_or_default(form.data, 'language', "").lower()
     query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
     difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])
     age = get_data_or_default(form.data, 'age', "")
@@ -248,6 +243,7 @@ def advanced_search(request):  # search through database for specific games with
         game_designers = " ".join([designer.name.lower() for designer in game.designers.all()])
         game_artists = " ".join([artist.name.lower() for artist in game.artists.all()])
         game_publishers = " ".join([publisher.name.lower() for publisher in game.publishers.all()])
+        game_languages = " ".join([language.name.lower() for language in game.language.all()])
         # check the multi-requirement of the form
         if name in game.name.lower()\
                 and artist in game_artists \
@@ -259,7 +255,7 @@ def advanced_search(request):  # search through database for specific games with
                 and (not time or time and ((game.by_player and int(player_number) * game.max_time <= int(playing_time))
                                     or (not game.by_player and game.max_time and game.max_time <= int(playing_time)))) \
                 and ((game.age and int(age) >= game.age) or not game.age)\
-                and not_present_on_query_or_valid(game.language, language) \
+                and language in game_languages \
                 and any_game_playing_mode_present(game, query_game_playing_mode):
             games.append(game)
     title = f"Résultats pour {context['interface'].theme.query_name} avancée"
