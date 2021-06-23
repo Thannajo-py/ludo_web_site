@@ -98,13 +98,14 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
                 max_time=api_answer['max_playtime'],
             )
             registered_game.save()
-        try:
-            main_designer = Designer.objects.get(name=api_answer['primary_designer']['name'])
-        except ObjectDoesNotExist:
-            main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
-            main_designer.save()
-        registered_game.designers.add(main_designer)
-        artists_list = api_answer['artists']
+        if 'primary_designer' in api_answer:
+            try:
+                main_designer = Designer.objects.get(name=api_answer['primary_designer']['name'])
+            except ObjectDoesNotExist:
+                main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
+                main_designer.save()
+            registered_game.designers.add(main_designer)
+            artists_list = api_answer['artists']
         for artist in artists_list:
             try:
                 game_artist = Artist.objects.get(name=artist)
@@ -112,13 +113,14 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
                 game_artist = Artist.objects.create(name=artist)
                 game_artist.save()
             registered_game.artists.add(game_artist)
-        try:
-            main_publisher = Publisher.objects.get(name=api_answer['primary_publisher']['name'])
-        except ObjectDoesNotExist:
-            main_publisher = Publisher.objects.create(name=api_answer['primary_publisher']['name'])
-            main_publisher.save()
-        registered_game.publishers.add(main_publisher)
-        registered_game.save()
+        if 'primary_publisher' in api_answer:
+            try:
+                main_publisher = Publisher.objects.get(name=api_answer['primary_publisher']['name'])
+            except ObjectDoesNotExist:
+                main_publisher = Publisher.objects.create(name=api_answer['primary_publisher']['name'])
+                main_publisher.save()
+            registered_game.publishers.add(main_publisher)
+            registered_game.save()
         context.update({
             'message': 'Enregistrement réalisé avec succès',
         })
