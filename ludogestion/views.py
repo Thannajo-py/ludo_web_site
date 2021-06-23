@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 
 from django.shortcuts import render
@@ -9,8 +10,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 
 
-from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn
+from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn, MultiAddOn
+from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 from .forms import LogInForm
+from .models import Reservation
 
 
 def base(request):  # give the basic context of each page
@@ -99,11 +102,14 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
             )
             registered_game.save()
         try:
-            main_designer = Designer.objects.get(name=api_answer['primary_designer']['name'])
-        except ObjectDoesNotExist:
-            main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
-            main_designer.save()
-        registered_game.designers.add(main_designer)
+            try:
+                main_designer = Designer.objects.get(name=api_answer['primary_designer']['name'])
+            except ObjectDoesNotExist:
+                main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
+                main_designer.save()
+            registered_game.designers.add(main_designer)
+        except KeyError:
+            pass
         artists_list = api_answer['artists']
         for artist in artists_list:
             try:
@@ -113,12 +119,15 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
                 game_artist.save()
             registered_game.artists.add(game_artist)
         try:
-            main_publisher = Publisher.objects.get(name=api_answer['primary_publisher']['name'])
-        except ObjectDoesNotExist:
-            main_publisher = Publisher.objects.create(name=api_answer['primary_publisher']['name'])
-            main_publisher.save()
-        registered_game.publishers.add(main_publisher)
-        registered_game.save()
+            try:
+                main_publisher = Publisher.objects.get(name=api_answer['primary_publisher']['name'])
+            except ObjectDoesNotExist:
+                main_publisher = Publisher.objects.create(name=api_answer['primary_publisher']['name'])
+                main_publisher.save()
+            registered_game.publishers.add(main_publisher)
+            registered_game.save()
+        except KeyError:
+            pass
         context.update({
             'message': 'Enregistrement réalisé avec succès',
         })
@@ -149,3 +158,27 @@ def log_out(request):  # handle logout attempt
     context['authentified'] = False
     logout(request)
     return render(request, 'ludogestion/logout_success.html', context)
+
+def add_reservation(request, type, id):
+    #ADD BUTTON and TEST
+    user = request.user
+    reservation = Reservation.object.create()
+    reservation.expired_at = reservation.created_at + datetime.timedelta(reservation.duration)
+    reservation.user_id = user
+    if type == "game":
+        reservation_object = Game.objects.get(pk=id)
+        reservation.game_id = reservation_object
+        reservation.save()
+        return detail(request, id)
+    elif type == "add_on":
+        reservation_object = AddOn.objects.get(pk=id)
+        reservation.addon_id = reservation_object
+        reservation.save()
+        return add_on_detail(request, id)
+    else:
+        reservation_object = MultiAddOn.objects.get(pk=id)
+        reservation.multiaddon_id = reservation_object
+        reservation.save()
+        return multi_add_on_detail(request, id)
+
+

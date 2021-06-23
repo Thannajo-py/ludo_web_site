@@ -4,14 +4,25 @@ from django.shortcuts import render, get_object_or_404
 
 
 from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Topic,\
-    Mechanism, Language
+    Mechanism, Language, Background
 from ludoaccueil.models import Comment
 from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
-from ludogestion.views import base
 from ludoaccueil.forms import CommentForm
 
 
+def base(request):  # give the basic context of each page
+    authentified = False
+    form = LogInForm()
+    if request.user.is_authenticated:
+        authentified = True
+    interface = Background.objects.get(name='Interface')
+    context = {
+        'interface': interface,
+        'authentified': authentified,
+        'form': form,
+    }
+    return context
 # Create your views here.
 def index(request):
     context = base(request)
