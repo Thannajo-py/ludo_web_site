@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 import json
 import time
@@ -10,12 +12,27 @@ from django.contrib.auth.decorators import login_required
 
 from ludorecherche.models import Game, Background
 from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
-from ludogestion.views import base
 from .models import News, Comment
 from .forms import CommentForm
+from ludogestion.models import Reservation
+from ludogestion.forms import LogInForm
 
 
 last_update = 0
+
+
+def base(request):  # give the basic context of each page
+    authentified = False
+    form = LogInForm()
+    if request.user.is_authenticated:
+        authentified = True
+    interface = Background.objects.get(name='Interface')
+    context = {
+        'interface': interface,
+        'authentified': authentified,
+        'form': form,
+    }
+    return context
 
 
 class ShowItems:  # models for Game Board Atlas data
@@ -50,6 +67,7 @@ def accueil(request):  # Build the presentation page and send it back
         most_popular = news('order_by=popularity&ascending=false&limit=5')
         last_kickstarters = news('kickstarter=true&limit=5')
         last_update = actual_time
+        reservations = [reservation.delete() for reservation in Reservation.objects.all() if reservation.expired_at < datetime.datetime.now(datetime.timezone.utc)]
     context.update({
         'last_news': last_news,
         'last_kickstarters': last_kickstarters,
@@ -75,11 +93,11 @@ def post_comment(request, type_id, type_name):
             comment.game_id = type_id
             comment.save()
             return detail(request, type_id)
-        elif type_name == 'add_on':
+        elif type_name == 'addon':
             comment.add_on_id = type_id
             comment.save()
             return add_on_detail(request, type_id)
-        elif type_name == 'multi_add_on':
+        elif type_name == 'multiaddon':
             comment.multi_add_on_id = type_id
             comment.save()
             return multi_add_on_detail(request, type_id)

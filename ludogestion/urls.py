@@ -14,4 +14,5 @@ urlpatterns = [
     path('log_in/', views.log_in, name="log_in"),  # handle connection attempt
     path('log_out/', views.log_out, name="log_out"),  # handle log out attempt
     re_path(r'^add_(?P<game_id>.+)/$', views.add_a_game, name='add_a_game'),  # register game data in database
+    re_path(r'^reservation_(?P<type_id>[0-9]+)_(?P<type_name>.+)/$', views.add_reservation, name='add_reservation'),  # reservation in database
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

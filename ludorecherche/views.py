@@ -9,6 +9,7 @@ from ludoaccueil.models import Comment
 from .forms import SearchAdvForm
 from ludogestion.forms import LogInForm
 from ludoaccueil.forms import CommentForm
+from ludogestion.models import Reservation
 
 
 def base(request):  # give the basic context of each page
@@ -44,24 +45,17 @@ def list_all(request):
 
 def common_detail(variable, context):
     form_comment = CommentForm()
-    multi_add_ons = [multi_add_on for multi_add_on in variable.multi_add_ons.all()]
     artists = [artist for artist in variable.artists.all()]
     designers = [designer for designer in variable.designers.all()]
     publishers = [publisher for publisher in variable.publishers.all()]
     languages = [language for language in variable.language.all()]
     playing_modes = [playing_mode for playing_mode in variable.playing_mode.all()]
-    tags = [tag for tag in variable.tag.all()]
-    topics = [topic for topic in variable.topic.all()]
-    mechanisms = [mechanism for mechanism in variable.mechanism.all()]
+
     context.update({
         'designers': designers,
         'artists': artists,
         'publishers': publishers,
         'playing_modes': playing_modes,
-        'tags': tags,
-        'mechanisms': mechanisms,
-        'topics': topics,
-        'multi_add_ons': multi_add_ons,
         'languages': languages,
         'form_comment': form_comment,
     })
@@ -71,9 +65,15 @@ def common_detail(variable, context):
 def detail(request, game_pk):  # Game detail
     context = base(request)
     game = get_object_or_404(Game, pk=game_pk)
+    multi_add_ons = [multi_add_on for multi_add_on in game.multi_add_ons.all()]
     context = common_detail(game, context)
     add_ons = AddOn.objects.filter(game__name__icontains=game.name)
     comments = Comment.objects.filter(game__name__icontains=game.name)
+    tags = [tag for tag in game.tag.all()]
+    topics = [topic for topic in game.topic.all()]
+    mechanisms = [mechanism for mechanism in game.mechanism.all()]
+    reserved = Reservation.objects.filter(game=game_pk)
+    stock = game.stock - len(reserved)
     # give the difficulty symbol his color
     if game.difficulty:
         color = 'green' if game.difficulty.name.lower() in ['famille', 'ambiance'] \
@@ -86,6 +86,11 @@ def detail(request, game_pk):  # Game detail
         'add_ons': add_ons,
         'comments': comments,
         'type': 'game',
+        'stock': stock,
+        'multi_add_ons': multi_add_ons,
+        'tags': tags,
+        'mechanisms': mechanisms,
+        'topics': topics,
     })
     return render(request, 'ludorecherche/detail.html', context)
 
@@ -96,6 +101,8 @@ def add_on_detail(request, add_on_pk):
     context = common_detail(add_on, context)
     game = add_on.game
     comments = Comment.objects.filter(add_on__name__icontains=add_on.name)
+    reserved = Reservation.objects.filter(addon=add_on_pk)
+    stock = game.stock - len(reserved)
     # give the difficulty symbol his color
     if add_on.difficulty:
         color = 'green' if add_on.difficulty.name.lower() in ['famille', 'ambiance'] else 'orange'\
@@ -106,8 +113,9 @@ def add_on_detail(request, add_on_pk):
         'variable': add_on,
         'color': color,
         'link_game': game,
-        'type': 'add_on',
+        'type': 'addon',
         'comments': comments,
+        'stock':stock
     })
     return render(request, 'ludorecherche/detail.html', context)
 
@@ -283,6 +291,8 @@ def multi_add_on_detail(request, multi_add_on_pk):
     context = common_detail(multi_add_on, context)
     games = [game for game in multi_add_on.games.all()]
     comments = Comment.objects.filter(multi_add_on__name__icontains=multi_add_on.name)
+    reserved = Reservation.objects.filter(multiaddon=multi_add_on_pk)
+    stock = multi_add_on.stock - len(reserved)
     # give the difficulty symbol his color
     if multi_add_on.difficulty:
         color = 'green' if multi_add_on.difficulty.name.lower() in ['famille', 'ambiance'] \
@@ -293,8 +303,9 @@ def multi_add_on_detail(request, multi_add_on_pk):
         'variable': multi_add_on,
         'color': color,
         'games': games,
-        'type': 'multi_add_on',
+        'type': 'multiaddon',
         'comments': comments,
+        'stock': stock,
     })
     return render(request, 'ludorecherche/detail.html', context)
 

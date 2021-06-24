@@ -23,14 +23,25 @@
             <img src="{% static 'ludorecherche/img/logo.png' %}" class="list">
         </div>
         <div>
-            <a href="{% url 'accueil' %}"><button type="button">Accueil</button></a>
-            <a href="{% url 'ludogestion:find_a_game' %}"><button type="button">Ludogestion</button></a>
-            <a href="{% url 'ludorecherche:index' %}"><button type="button">Ludorecherche</button></a>
+            <div>
+
+                <a href="{% url 'accueil' %}" class="main_button"><button type="button"><i class="fas fa-home"></i></button></a>
+                <div>
+                    <a href="#popular"><button type="button">tendance</button></a>
+                <a href="#kickstarter"><button type="button">kickstarter</button></a>
+                <a href="#ludonews"><button type="button">Arrivage ludothèque</button></a>
+                <a href="#news"><button type="button">Les News</button></a>
+                </div>
+
+            </div>
+            <a href="{% url 'ludorecherche:index' %}"><button type="button"><i class="fas fa-dice"></i></button></a>
+            <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-user"></i></button></a>
+            <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-lock"></i></button></a>
         </div>
         {% if authentified %}
             <form class="logging" action="{% url 'ludogestion:log_out'%}" method="POST">
                 {% csrf_token %}
-                <button type="submit">Log out</button>
+                <button type="submit"><i class="fas fa-power-off"></i></button>
             </form>
         {% else %}
             <form class="logging" action="{% url 'ludogestion:log_in'%}" method="POST">
