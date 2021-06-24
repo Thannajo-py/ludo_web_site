@@ -24,19 +24,28 @@
         </div>
         <div>
             <div>
-
                 <a href="{% url 'accueil' %}" class="main_button"><button type="button"><i class="fas fa-home"></i></button></a>
-                <div>
-                    <a href="#popular"><button type="button">tendance</button></a>
-                <a href="#kickstarter"><button type="button">kickstarter</button></a>
-                <a href="#ludonews"><button type="button">Arrivage ludothèque</button></a>
-                <a href="#news"><button type="button">Les News</button></a>
-                </div>
-
             </div>
-            <a href="{% url 'ludorecherche:index' %}"><button type="button"><i class="fas fa-dice"></i></button></a>
-            <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-user"></i></button></a>
-            <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-lock"></i></button></a>
+            <div class="ludorecherche_menu">
+                <div>
+                    <a href="{% url 'ludorecherche:index' %}"><button type="button">Derniers ajouts</button></a>
+                    <a href="{% url 'ludorecherche:search_page' %}"><button type="button">Recherche avancée</button></a>
+                    <a href="{% url 'ludorecherche:list_all' %}"><button type="button">Tous les jeux</button></a>
+                    <a href="{% url 'ludorecherche:lucky' %}"><button type="button">Tenter sa chance</button></a>
+                </div>
+                <button type="button"><i class="fas fa-dice"></i></button>
+            </div>
+            <div class="ludocompte_menu">
+
+                <a href="#"><button type="button"><i class="fas fa-user"></i></button></a>
+            </div>
+
+            <div class="ludogestion_menu">
+                <div>
+                    <a href="{% url 'ludogestion:find_a_game' %}"><button type="button">Ajouter un jeu</button></a>
+                </div>
+                <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-lock"></i></button></a>
+            </div>
         </div>
         {% if authentified %}
             <form class="logging" action="{% url 'ludogestion:log_out'%}" method="POST">

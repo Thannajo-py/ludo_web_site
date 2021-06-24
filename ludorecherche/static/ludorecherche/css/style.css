@@ -95,19 +95,27 @@ footer > div > div {
     display: flex;
     flex-direction: column;
     position:relative;
+    margin: 10px;
 }
 footer > div > div > div{
     height:50px;
-    width:50px;
+    width:300px;
     position:absolute;
     visibility:hidden;
 }
 
 
-footer > div > div:hover > div{
-    top:-200px;
+footer > div > div:hover > div, footer > div > div > div:hover{
     left:-125px;
     visibility:visible;
+    z-index:1;
+
+}
+.ludorecherche_menu > div {
+    top:-200px;
+}
+.ludogestion_menu > div {
+    top:-50px;
 
 }
 footer > div > div:hover > div > a > button{
@@ -457,10 +465,20 @@ button[type="submit"]{
     nav,.search_option{
         font-size: 30px;
     }
-
-    nav > a > button{
-        height:100%;
-        font-size: 30px;
+    nav:not(.ludorecherche) {
+        display: none;
+    }
+    .ludorecherche a {
+        display:none;
+    }
+    .ludorecherche form {
+        display:flex;
+        justify-content: center;
+        width:100%
+    }
+    #searchForm {
+        width:100%;
+        height:100%
     }
 }
 
