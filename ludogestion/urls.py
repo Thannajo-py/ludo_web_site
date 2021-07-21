@@ -17,4 +17,5 @@ urlpatterns = [
     path('reservation_page',views.reservation_page, name="reservation_page"),
     re_path(r'^add_(?P<game_id>.+)/$', views.add_a_game, name='add_a_game'),  # register game data in database
     re_path(r'^reservation_(?P<type_id>[0-9]+)_(?P<type_name>.+)/$', views.add_reservation, name='add_reservation'),  # reservation in database
+    re_path(r'^remove_reservation_(?P<reservation_id>[0-9]+)/$', views.remove_reservation, name='remove_reservation'),  # remove reservation in database
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

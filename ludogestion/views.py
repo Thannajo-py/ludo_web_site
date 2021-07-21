@@ -174,19 +174,15 @@ def add_reservation(request, type_name, type_id):
             reservation_object = Game.objects.get(pk=type_id)
             reservation.game_id = reservation_object
             reservation.save()
-            return detail(request, type_id)
         elif type_name == "addon":
             reservation_object = AddOn.objects.get(pk=type_id)
             reservation.addon_id = reservation_object
             reservation.save()
-            return add_on_detail(request, type_id)
         else:
             reservation_object = MultiAddOn.objects.get(pk=type_id)
             reservation.multiaddon_id = reservation_object
             reservation.save()
-            return multi_add_on_detail(request, type_id)
-    else:
-        return accueil(request)
+    return reservation_page(request)
 
 
 def reservation_page(request):
@@ -196,3 +192,9 @@ def reservation_page(request):
         "reservations":reservations
     })
     return render(request, 'ludogestion/reservation.html', context)
+
+
+def remove_reservation(request, reservation_id):
+    reservation = Reservation.objects.get(id=reservation_id)
+    reservation.delete()
+    return reservation_page(request)
