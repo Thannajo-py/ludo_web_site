@@ -111,16 +111,49 @@ footer > div > div:hover > div, footer > div > div > div:hover{
     z-index:1;
 
 }
+
+.reservation{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+.reservation td,.reservation th{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+.reservation tr > td:last-of-type{
+    text-align: center;
+}
+.reservation button{
+    width:50px;
+    height:50px;
+    border-radius:25px;
+    font-size: 30px;
+
+}
 .ludorecherche_menu > div {
+    top:-200px;
+}
+.ludoaccueil_menu > div {
     top:-200px;
 }
 .ludogestion_menu > div {
     top:-50px;
 
 }
+.ludocompte_menu > div {
+    top:-100px;
+}
 footer > div > div:hover > div > a > button{
     width:300px;
     height:50px;
+
+}
+.option_button{
+    width:20%;
+    height:50px;
+    font-size:0.75em;
+    word-break: break-word;
+    border-radius:20px;
 
 }
 

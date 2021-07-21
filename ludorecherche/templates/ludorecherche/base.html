@@ -20,11 +20,17 @@
     <footer>
         <div>
             <p>Projet <span id="red_stripe">fil_rouge</span> DEV FAD 31-01-21 J.AUDIFFREN</p>
-            <img src="{% static 'ludorecherche/img/logo.png' %}" class="list">
+            <img src="{% static 'ludorecherche/img/logo.png' %}" class="list" alt="logo">
         </div>
         <div>
-            <div>
-                <a href="{% url 'accueil' %}" class="main_button"><button type="button"><i class="fas fa-home"></i></button></a>
+            <div class="ludoaccueil_menu">
+                <div>
+                    <a href="{% url 'accueil' %}#popular"><button type="button">tendance</button></a>
+                    <a href="{% url 'accueil' %}#kickstarter"><button type="button">kickstarter</button></a>
+                    <a href="{% url 'accueil' %}#ludonews"><button type="button">Arrivage ludothèque</button></a>
+                    <a href="{% url 'accueil' %}#news"><button type="button">Les News</button></a>
+                </div>
+                <button type="button"><i class="fas fa-home"></i></button></a>
             </div>
             <div class="ludorecherche_menu">
                 <div>
@@ -36,8 +42,16 @@
                 <button type="button"><i class="fas fa-dice"></i></button>
             </div>
             <div class="ludocompte_menu">
+                <div>
+                    {% if not authentified %}
+                        <a href="{% url 'ludogestion:log_in_page' %}"><button type="button">Se connecter</button></a>
+                    {% else %}
+                        <a href="{% url 'ludogestion:log_out' %}"><button type="button">Se déconnecter</button></a>
+                    {% endif %}
+                    <a href="{% url 'ludogestion:reservation_page' %}"><button type="button">Mes réservations</button></a>
+                </div>
 
-                <a href="#"><button type="button"><i class="fas fa-user"></i></button></a>
+                <button type="button"><i class="fas fa-user"></i></button>
             </div>
 
             <div class="ludogestion_menu">
@@ -47,31 +61,7 @@
                 <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-lock"></i></button></a>
             </div>
         </div>
-        {% if authentified %}
-            <form class="logging" action="{% url 'ludogestion:log_out'%}" method="POST">
-                {% csrf_token %}
-                <button type="submit"><i class="fas fa-power-off"></i></button>
-            </form>
-        {% else %}
-            <form class="logging" action="{% url 'ludogestion:log_in'%}" method="POST">
-                {% csrf_token %}
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><label for="{{ form.name.id_for_label }}">Nom</label></td>
-                            <td>{{ form.name }}</td>
-                        </tr>
-                        <tr>
-                            <td><label for="{{ form.password.id_for_label }}">Mot de passe</label></td>
-                            <td>{{ form.password }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><button type="submit">Log In</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
-        {% endif %}
+
     </footer>
 </body>
 </html>

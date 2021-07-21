@@ -131,6 +131,11 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
         return render(request, 'ludogestion/find_a_game.html', context)
 
 
+def log_in_page(request):
+    context = base(request)
+    return render(request, 'ludogestion/login.html', context)
+
+
 def log_in(request):  # Handle login attempt
     context = base(request)
     if request.method == "POST":
@@ -184,3 +189,10 @@ def add_reservation(request, type_name, type_id):
         return accueil(request)
 
 
+def reservation_page(request):
+    reservations = Reservation.objects.filter(user_id=request.user.id)
+    context = base(request)
+    context.update({
+        "reservations":reservations
+    })
+    return render(request, 'ludogestion/reservation.html', context)
