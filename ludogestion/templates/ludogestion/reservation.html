@@ -1,0 +1,27 @@
+{% extends 'ludogestion/ludogestion.html' %}
+{% block content %}
+{% load static %}
+<h1>Mes réservations</h1>
+    <table class="reservation">
+        <thead>
+        <tr>
+            <th>Date de création</th><th>Valide jusqu'au</th><th>Nom du jeu</th><th>Annulez la réservation</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations%}
+        <tr>
+            <td>{{ reservation.created_at }}</td><td>{{ reservation.expired_at }}</td><td>
+            {% if reservation.game %}
+                {{ reservation.game.name }}
+            {% elif reservation.addon %}
+                {{ reservation.addon.name }}
+            {% elif reservation.multiaddon %}
+                {{ reservation.multiaddon.name }}
+            {% endif %}
+        </td><td><a href="{% url 'ludogestion:remove_reservation' reservation_id=reservation.id  %}"><button><i class="fas fa-times-circle"></i></button></a></td>
+        </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -20,3 +20,5 @@ class CommentAdmin(admin.ModelAdmin):  # comment of game or news
     ordering = ['created_at', 'title']
 
 
+
+

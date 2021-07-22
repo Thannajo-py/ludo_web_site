@@ -1,5 +1,6 @@
 import requests
 import json
+import datetime
 
 
 from django.shortcuts import render
@@ -9,8 +10,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 
 
-from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn
+from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn, MultiAddOn
+from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
+from ludoaccueil.views import accueil
 from .forms import LogInForm
+from .models import Reservation, ReservationRule
 
 
 def base(request):  # give the basic context of each page
@@ -105,7 +109,7 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
                 main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
                 main_designer.save()
             registered_game.designers.add(main_designer)
-            artists_list = api_answer['artists']
+        artists_list = api_answer['artists']
         for artist in artists_list:
             try:
                 game_artist = Artist.objects.get(name=artist)
@@ -125,6 +129,11 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
             'message': 'Enregistrement réalisé avec succès',
         })
         return render(request, 'ludogestion/find_a_game.html', context)
+
+
+def log_in_page(request):
+    context = base(request)
+    return render(request, 'ludogestion/login.html', context)
 
 
 def log_in(request):  # Handle login attempt
@@ -151,3 +160,41 @@ def log_out(request):  # handle logout attempt
     context['authentified'] = False
     logout(request)
     return render(request, 'ludogestion/logout_success.html', context)
+
+def add_reservation(request, type_name, type_id):
+    #WORKING NEED A SUCCESS RES/ FAILED RES RULES
+    user = request.user
+    reservation_number = Reservation.objects.filter(user_id=user)
+    if len(reservation_number) < ReservationRule.objects.get(pk=1).max_number:
+        reservation = Reservation.objects.create()
+        reservation.reservation = ReservationRule.objects.get(pk=1)
+        reservation.expired_at = reservation.created_at + datetime.timedelta(reservation.reservation.duration)
+        reservation.user_id = user
+        if type_name == "game":
+            reservation_object = Game.objects.get(pk=type_id)
+            reservation.game_id = reservation_object
+            reservation.save()
+        elif type_name == "addon":
+            reservation_object = AddOn.objects.get(pk=type_id)
+            reservation.addon_id = reservation_object
+            reservation.save()
+        else:
+            reservation_object = MultiAddOn.objects.get(pk=type_id)
+            reservation.multiaddon_id = reservation_object
+            reservation.save()
+    return reservation_page(request)
+
+
+def reservation_page(request):
+    reservations = Reservation.objects.filter(user_id=request.user.id)
+    context = base(request)
+    context.update({
+        "reservations":reservations
+    })
+    return render(request, 'ludogestion/reservation.html', context)
+
+
+def remove_reservation(request, reservation_id):
+    reservation = Reservation.objects.get(id=reservation_id)
+    reservation.delete()
+    return reservation_page(request)
