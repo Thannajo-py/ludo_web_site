@@ -1,0 +1,1 @@
+[{"model": "ludogestion.reservationrule", "pk": 1, "fields": {"duration": 15, "max_number": 3}}]
