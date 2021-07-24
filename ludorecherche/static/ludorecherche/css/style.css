@@ -112,14 +112,20 @@ footer > div > div:hover > div, footer > div > div > div:hover{
 
 }
 
+h1+h3{
+    text-align: center;
+}
+
+.reservation td,.reservation th, .reservation tr, .reservation{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
 .reservation{
-    border: 1px solid black;
-    border-collapse: collapse;
+    padding:0;
+    margin:auto;
 }
-.reservation td,.reservation th{
-    border: 1px solid black;
-    border-collapse: collapse;
-}
+
 .reservation tr > td:last-of-type{
     text-align: center;
 }

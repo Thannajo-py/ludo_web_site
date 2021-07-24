@@ -7,13 +7,11 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 
 
 from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn, MultiAddOn
-from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
-from ludoaccueil.views import accueil
-from .forms import LogInForm
+from .forms import LogInForm,AddAGameForm
 from .models import Reservation, ReservationRule
 
 
@@ -198,3 +196,11 @@ def remove_reservation(request, reservation_id):
     reservation = Reservation.objects.get(id=reservation_id)
     reservation.delete()
     return reservation_page(request)
+
+def adding_page(request):
+    add_form = AddAGameForm()
+    context = base(request)
+    context.update({
+        "add_form": add_form
+    })
+    return render(request, 'ludogestion/add_a_game.html', context)

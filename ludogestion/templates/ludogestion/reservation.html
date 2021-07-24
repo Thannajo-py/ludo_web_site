@@ -2,6 +2,9 @@
 {% block content %}
 {% load static %}
 <h1>Mes réservations</h1>
+{% if not reservations %}
+    <h3>Aucune réservation à ce jour</h3>
+{% else %}
     <table class="reservation">
         <thead>
         <tr>
@@ -24,4 +27,5 @@
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 {% endblock %}
