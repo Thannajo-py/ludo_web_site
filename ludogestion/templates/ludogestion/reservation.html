@@ -28,4 +28,9 @@
         </tbody>
     </table>
     {% endif %}
+    {% if reservation_result == 1 %}
+        <h3 class="success">Réservation réalisée avec succès.</h3>
+    {% elif reservation_result == 2 %}
+        <h3  class="failure">Echec lors de la réservation, quota maximal atteint.</h3>
+    {% endif %}
 {% endblock %}

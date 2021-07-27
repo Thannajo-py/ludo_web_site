@@ -4,17 +4,36 @@ from django.db import models
 from colorfield.fields import ColorField
 
 
-class Designer(models.Model):
+class CompareByName:
     name = models.CharField('nom', max_length=200, unique=True)
-
-    class Meta:
-        verbose_name = "auteur"
 
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        return self.name == other.name
 
-class Tag(models.Model):
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __gt__(self, other):
+        return self.name > other.name
+
+    class Meta:
+        abstract = True
+
+
+class Designer(models.Model, CompareByName):
+    name = models.CharField('nom', max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "auteur"
+
+
+class Tag(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -24,7 +43,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Mechanism(models.Model):
+class Mechanism(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -35,7 +54,7 @@ class Mechanism(models.Model):
         return self.name
 
 
-class Topic(models.Model):
+class Topic(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -46,7 +65,7 @@ class Topic(models.Model):
         return self.name
 
 
-class Difficulty(models.Model):
+class Difficulty(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -56,7 +75,7 @@ class Difficulty(models.Model):
         return self.name
 
 
-class Artist(models.Model):
+class Artist(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -66,7 +85,7 @@ class Artist(models.Model):
         return self.name
 
 
-class Publisher(models.Model):
+class Publisher(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -76,7 +95,7 @@ class Publisher(models.Model):
         return self.name
 
 
-class PlayingMode(models.Model):
+class PlayingMode(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -87,7 +106,7 @@ class PlayingMode(models.Model):
         return self.name
 
 
-class Language(models.Model):
+class Language(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
