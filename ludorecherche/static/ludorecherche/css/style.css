@@ -426,9 +426,6 @@ ul.list_game > li > a > button{
     text-align: center;
 }
 
-#detail_image {
-    animation: apparition 3s linear;
-}
 
 #add_bar{
     padding:20px;

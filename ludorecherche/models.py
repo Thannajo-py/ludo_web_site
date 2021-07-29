@@ -118,7 +118,7 @@ class Language(models.Model, CompareByName):
 
 class GameAddOnMultiAddOnCommonBase(models.Model):
     name = models.CharField('nom', max_length=200, unique=True)
-    english_name = models.CharField('nom anglais', max_length=200, unique=True,null=True, blank=True)
+    english_name = models.CharField('nom anglais', max_length=200, null=True, blank=True)
     player_min = models.IntegerField('nombre de joueur minimum', null=True, blank=True)
     player_max = models.IntegerField('nombre de joueur maximum', null=True, blank=True)
     playing_time = models.CharField('durée de jeu', max_length=50, null=True, blank=True)
@@ -131,7 +131,7 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
     designers = models.ManyToManyField(Designer, verbose_name='Auteur', blank=True)
     artists = models.ManyToManyField(Artist, verbose_name='illustrateur', blank=True)
     publishers = models.ManyToManyField(Publisher, verbose_name='éditeur', blank=True)
-    bgg_link = models.TextField("URL de BGG ou Tric Trac ", blank=True)
+    bgg_link = models.TextField("URL de BGG ou Tric Trac ", blank=True, null=True)
     playing_mode = models.ManyToManyField(PlayingMode, verbose_name='type', blank=True)
     language = models.ManyToManyField(Language, verbose_name='langue', blank=True)
     age = models.IntegerField('âge', blank=True, null=True)
@@ -143,8 +143,8 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
         abstract = True
 
 
-class Game(GameAddOnMultiAddOnCommonBase):
-    by_player = models.BooleanField('temps de jeu défini par joueur ?', default=False)
+class Game(GameAddOnMultiAddOnCommonBase, CompareByName):
+    by_player = models.BooleanField('temps de jeu défini par joueur ?', blank=True, null=True)
     tag = models.ManyToManyField(Tag, verbose_name='étiquettes', related_name='games', blank=True)
     mechanism = models.ManyToManyField(Mechanism, verbose_name='mécaniques associées', related_name='games', blank=True)
     topic = models.ManyToManyField(Topic, verbose_name='thèmes associés', related_name='games', blank=True)

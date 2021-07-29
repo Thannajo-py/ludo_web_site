@@ -2,9 +2,11 @@
 {% block content %}
 {% load static %}
     <h1>Ajouter un jeu</h1>
-
-  <form class="adding" action="#" method="get">
-
+    {% if message %}
+        <h3>{{ message }}</h3>
+    {% endif %}
+  <form class="adding" action="{% url 'ludogestion:register_a_game'%}" method="POST">
+    {% csrf_token %}
     <table class="adding_table">
       <tbody>
       {% for field in add_form %}

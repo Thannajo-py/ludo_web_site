@@ -10,9 +10,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import permission_required
 
 
-from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn, MultiAddOn, Mechanism, Topic
+from ludorecherche.models import Background, Game, Designer, Artist, Publisher, AddOn, MultiAddOn, Mechanism, Topic,\
+    Difficulty, PlayingMode, Language, Tag
 from .forms import LogInForm, AddAGameForm
 from .models import Reservation, ReservationRule
+from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 
 
 
@@ -77,7 +79,6 @@ def recall_api(type, api_answer, model):
 def check_api_answer(api_answer):
     check_parameters = ['type', 'name']
 @permission_required('ludorecherche.add_game') # decorator checking if user have right to add game
-@transaction.atomic  # ensure all the register go well or cancel change in database
 def add_a_game(request, game_id):  # Register selected game from page to database if not present
     context = base(request)
 
@@ -104,7 +105,7 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
     try:
         if api_answer.get('type') is None:
             context.update({
-                'message': 'Ce jeu est déjà dans la ludothèque',
+                'message': 'type inconnu',
             })
             return render(request, 'ludogestion/find_a_game.html', context)
         elif api_answer.get('type') == 'game':
@@ -130,16 +131,21 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
             'bgg_link': f"{api_answer.get('url')}",
             'age': f"{api_answer.get('min_age')}",
             'max_time': f"{api_answer.get('max_playtime')}",
+            'stock': 1,
+            'buying_price':0,
+            'difficulty': 'Famille'
         })
 
         if api_answer['type'] == 'game':
             context.update({'type': 'game'})
+            add_form.initial["type"] = "Jeu"
         else:
+            add_form.initial["type"] = "Extension simple"
             context.update({'type': 'extension'})
         if 'primary_designer' in api_answer:
             try:
                 Designer.objects.get(name=api_answer.get('primary_designer').get('name'))
-                add_form.initial['designers'] = api_answer.get('primary_designer').get('name')
+                add_form.initial['designer'] = api_answer.get('primary_designer').get('name')
             except ObjectDoesNotExist:
                 add_form.initial['add_designer'] = api_answer.get('primary_designer').get('name')
 
@@ -153,12 +159,12 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
             except ObjectDoesNotExist:
                 unknown_artist.append(artist)
         add_form.initial['add_artist'] = ", ".join(unknown_artist)
-        add_form.initial['artists'] = known_artist
+        add_form.initial['artist'] = known_artist
 
         if 'primary_publisher' in api_answer:
             try:
                 Publisher.objects.get(name=api_answer.get('primary_publisher').get('name'))
-                add_form.initial['publishers'] = api_answer.get('primary_publisher').get('name')
+                add_form.initial['publisher'] = api_answer.get('primary_publisher').get('name')
             except ObjectDoesNotExist:
                 add_form.initial['add_publisher'] = api_answer.get('primary_publisher').get('name')
 
@@ -247,68 +253,107 @@ def remove_reservation(request, reservation_id):
     return reservation_page(request)
 
 
-def adding_page(request):
-    add_form = AddAGameForm(initial={"name": "bob",'extension_type': 1,'language':['Anglais','Français'],'publishers':'Asmodée'})
-    context = base(request)
-    context.update({
-        "add_form": add_form
-    })
-    return render(request, 'ludogestion/add_a_game.html', context)
+def register_main(table, form):
+    entry = table.objects.create(
+        name=form.data.get("name", ""),
+        english_name=form.data.get("name", ""),
+        player_min=form.data.get('min_players', None),
+        player_max=form.data.get('max_players', None),
+        playing_time=form.data.get('playing_time'),
+        picture=form.data.get('picture', None),
+        external_image=form.data.get('external_image', None),
+        bgg_link=form.data.get('bgg_link', None),
+        age=form.data.get('min_age', None),
+        max_time=form.data.get('max_playtime', None),
+        stock=form.data.get('stock', None),
+        buying_price=form.data.get('buying_price', None)
+    )
+    thumb_image = form.data.get('external_thumb_image', None)
+    if thumb_image:
+        entry.thumb_image = thumb_image
+    add_list(entry, Designer, "designer", form, entry.designers)
+    add_list(entry, Artist, "artist", form, entry.artists)
+    add_list(entry, Publisher, "publisher", form, entry.publishers)
+    entry.difficulty = Difficulty.objects.get(name=form.data.get("difficulty"))
+    add_list(entry, PlayingMode, "playing_mode", form, entry.playing_mode)
+    add_list(entry, Language, "language", form, entry.language)
+    return entry
 
-
-
-""" if api_answer['type'] == 'game':
-            add_form.name.initial=api_answer.get('name')
-            registered_game = Game.objects.create(
-                name=api_answer.get('name'),
-                english_name=api_answer.get('name'),
-                player_min=api_answer.get('min_players'),
-                player_max=api_answer.get('max_players'),
-                external_image=api_answer.get('image_url'),
-                thumb_image=api_answer.get('thumb_url'),
-                bgg_link=api_answer.get('url'),
-                age=api_answer.get('min_age'),
-                max_time=api_answer.get('max_playtime'),
+def add_list(entry, model, name, form, field):
+    add_list = form.data.getlist(name, [])
+    unknown = form.data.get(f"add_{name}", "")
+    if unknown != "":
+        for add_object in unknown.split(","):
+            try:
+                to_add = model.objects.get(
+                    name=add_object
                 )
-            registered_game.save()
-        else:
-            registered_game = AddOn.objects.create(
-                name=api_answer.get('name'),
-                english_name=api_answer.get('name'),
-                player_min=api_answer['min_players'],
-                player_max=api_answer['max_players'],
-                external_image=api_answer['image_url'],
-                thumb_image=api_answer['thumb_url'],
-                bgg_link=api_answer['url'],
-                age=api_answer['min_age'],
-                max_time=api_answer['max_playtime'],
-            )
-            registered_game.save()
-        if 'primary_designer' in api_answer:
-            try:
-                main_designer = Designer.objects.get(name=api_answer['primary_designer']['name'])
             except ObjectDoesNotExist:
-                main_designer = Designer.objects.create(name=api_answer['primary_designer']['name'])
-                main_designer.save()
-            registered_game.designers.add(main_designer)
-        artists_list = api_answer['artists']
-        for artist in artists_list:
-            try:
-                game_artist = Artist.objects.get(name=artist)
-            except ObjectDoesNotExist:
-                game_artist = Artist.objects.create(name=artist)
-                game_artist.save()
-            registered_game.artists.add(game_artist)
-        if 'primary_publisher' in api_answer:
-            try:
-                main_publisher = Publisher.objects.get(name=api_answer['primary_publisher']['name'])
-            except ObjectDoesNotExist:
-                main_publisher = Publisher.objects.create(name=api_answer['primary_publisher']['name'])
-                main_publisher.save()
-            registered_game.publishers.add(main_publisher)
-            registered_game.save()
+                to_add = model.objects.create(
+                    name=add_object
+                )
+            if to_add is not None:
+                field.add(to_add)
+    for add_object in add_list:
+        field.add(model.objects.get(name=add_object))
+
+
+@transaction.atomic  # ensure all the register go well or cancel change in database
+def register_a_game(request):
+    context = base(request)
+    add_form = AddAGameForm(request.POST)
+    type = add_form.data.get("type", "")
+
+    if not add_form.data.get("name"):
         context.update({
-            'message': 'Enregistrement réalisé avec succès',
+            'message': 'erreur nom invalide',
+            'add_form': add_form
         })
-        return render(request, 'ludogestion/find_a_game.html', context)
-"""
+        return render(request, 'ludogestion/add_a_game.html', context)
+    if type == "Jeu":
+        try:
+            Game.objects.get(name=add_form.data.get("name"))
+            context.update({
+                'message': 'jeu déjà enregistré',
+                'add_form': add_form
+            })
+            return render(request, 'ludogestion/add_a_game.html', context)
+        except ObjectDoesNotExist:
+            game = register_main(Game, add_form)
+            add_list(game, Topic, "topic", add_form, game.topic)
+            add_list(game, Tag, "tag", add_form, game.tag)
+            add_list(game, Mechanism, "mechanism", add_form, game.mechanism)
+
+            game.by_player = True if(add_form.data.get("by_player")) else False
+            game.save()
+    elif type == "Extension simple":
+        try:
+            AddOn.objects.get(name=add_form.data.get("name"))
+            context.update({
+                'message': 'extension déjà enregistré',
+                'add_form': add_form
+            })
+            return render(request, 'ludogestion/add_a_game.html', context)
+        except ObjectDoesNotExist:
+            add_on = register_main(AddOn, add_form)
+            if add_form.data.get("associated_game"):
+                print(add_form.data.get('associated_game'))
+                add_on.game = Game.objects.get(name=add_form.data.get('associated_game'))
+                add_on.save()
+    else:
+        try:
+            multi_add_on = MultiAddOn.objects.get(name=add_form.data.get("name"))
+            context.update({
+                'message': 'extension déjà enregistré',
+                'add_form': add_form
+            })
+            return render(request, 'ludogestion/add_a_game.html', context)
+        except ObjectDoesNotExist:
+            multi_add_on = register_main(MultiAddOn, add_form)
+        if add_form.data.get("associated_game"):
+            multi_add_on.games.add(Game.objects.get(name=add_form.data.get('associated_game')))
+            multi_add_on.save()
+    context.update({
+        'message': 'Enregistrement réalisé avec succès',
+    })
+    return render(request, 'ludogestion/find_a_game.html', context)
