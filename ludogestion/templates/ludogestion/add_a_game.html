@@ -15,118 +15,13 @@
             <td>{{ field }}</td>
           </tr>
       {% endfor %}
-    {% comment %}<tr>
-      <td><label for="{{ add_form.name.id_for_label }}" ><i class="fas fa-heading"></i>Nom</label></td>
-      <td>{{ add_form.name }}</td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.english_name.id_for_label }}" ><i class="fas fa-heading"></i>Nom Anglais</label></td>
-      <td>{{ add_form.english_name }}</td>
-    </tr>
-      <tr>
-        <td><label for="{{ add_form.designer.id_for_label }}" ><i class="fas fa-user-edit"></i>Auteur</label></td>
-        <td>{{ add_form.designer }}</td>
-      </tr>
-    <tr>
-        <td><label for="{{ add_form.artist.id_for_label }}" ><i class="fas fa-paint-brush"></i>Illustrateur</label></td>
-        <td>{{ add_form.artist }}</td>
-    </tr>
-    <tr>
-        <td><label for="{{ form.publisher.id_for_label }}" ><i class="fas fa-paper-plane"></i>Éditeur</label></td>
-        <td>{{ add_form.publisher }}</td>
-    </tr>
-    <tr>
-        <td><label for="{{ add_form.playing_time.id_for_label }}" ><i class="fas fa-stopwatch"></i>Temps de jeu</label></td>
-        <td>{{ add_form.playing_time }}</td>
-    </tr>
-    <tr>
-        <td><label for="{{ add_form.player_min.id_for_label }}" ><i class="fas fa-stopwatch"></i>Nombre de joueur minimum</label></td>
-        <td>{{ add_form.player_min }}</td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.player_max.id_for_label }}" ><i class="fas fa-users"></i>Nombre de joueurs maximum</label></td>
-      <td>{{ add_form.player_max }}</td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.age.id_for_label }}" ><i class="fas fa-baby"></i><i class="fas fa-child"></i><i class="fas fa-male"></i>Age</label></td>
-      <td>{{ add_form.age }}</td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.language.id_for_label }}"><i class="fas fa-language"></i>Langue</label></td>
-      <td>
-        {{add_form.language}}
-      </td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.playing_mode_choice.id_for_label }}"><i class="fas fa-chess-knight"></i>Type de jeu</label></td>
-      <td >
-        {{add_form.playing_mode}}
-      </td>
-    </tr>
-    <tr>
-        <td><label for="{{ add_form.difficulty.id_for_label }}"><i class="fas fa-signal"></i>Difficulté</label></td>
-        <td>
-          {{add_form.difficulty}}
-
-        </td>
-    </tr>
-    <tr>
-      <td><label for="{{ add_form.tag.id_for_label }}"><i class="fas fa-tags"></i>Étiquettes</label></td>
-      <td >
-        {{add_form.tag}}
-      </td>
-    </tr>
-      <tr>
-        <td><label for="{{ add_form.topic.id_for_label }}"><i class="fab fa-affiliatetheme"></i></i>Thèmes</label></td>
-        <td>
-            {{add_form.topic}}
-        </td>
-      </tr>
-      </tr>
-      <tr>
-        <td><label for="{{ add_form.mechanism.id_for_label }}"><i class="fas fa-cog"></i>Mécaniques</label></td>
-        <td>
-              {{add_form.mechanism}}
-      </td>
-    </tr>
-    <tr>
-        <td><label for="{{ add_form.picture.id_for_label }}"><i class="fas fa-cog"></i>Adresse locale image</label></td>
-        <td>
-              {{add_form.picture}}
-      </td>
-    </tr>
-            <tr>
-        <td><label for="{{ add_form.external_image.id_for_label }}"><i class="fas fa-cog"></i>Adresse externe image</label></td>
-        <td>
-              {{add_form.external_image}}
-      </td>
-    </tr>
-    <tr>
-        <td><label for="{{ add_form.external_thumb_image.id_for_label }}"><i class="fas fa-cog"></i>Adresse externe miniature</label></td>
-        <td>
-              {{add_form.picture}}
-      </td>
-    </tr>{% endcomment %}
-
-      {% comment %}=
-    external_thumb_image = forms.CharField(widget=forms.TextInput())
-
-    bgg_link = forms.CharField(widget=forms.TextInput())
-
-
-
-    buying_price = forms.IntegerField(widget=forms.IntegerField())
-    stock = forms.IntegerField(widget=forms.IntegerField())
-    max_time = forms.IntegerField(widget=forms.IntegerField())
-    by_player = forms.BooleanField(widget=forms.Select())
-
-    extension_type = forms.CharField(widget=forms.Select(choices=EXTENSION_CHOICE)){% endcomment %}
     </tbody>
       </table>
     <div class="add_a_game_button">
       <button type="submit" id="adding">Ajouter</button>
     </div>
   </form>
+    <script src="{% static 'ludorecherche/js/filter.js' %}"></script>
 
 
 {% endblock %}

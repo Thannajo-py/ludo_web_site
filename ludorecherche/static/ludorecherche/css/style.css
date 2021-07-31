@@ -431,6 +431,10 @@ ul.list_game > li > a > button{
     padding:20px;
 }
 
+.add_a_game_button{
+    text-align: center;
+}
+
 .news{
     display:flex;
     flex-wrap: wrap;

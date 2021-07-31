@@ -60,11 +60,12 @@ def retrieve_game_from_api(request):  # build the answer API BGA page
     return render(request, 'ludogestion/find_a_game.html', context)
 
 def recall_api(type, api_answer, model):
+    known = []
+    unknown = []
     if type in api_answer and len(api_answer.get(type)) > 0:
         all_type_list = json.loads(requests.get(
             f'https://api.boardgameatlas.com/api/game/{type}?pretty=true&client_id={CLIENT_ID}').text).get(type)
-        known = []
-        unknown = []
+
         for member in api_answer.get(type):
             for m in all_type_list:
                 if (member.get('id') == m.get('id')):
@@ -73,11 +74,9 @@ def recall_api(type, api_answer, model):
                         known.append(m.get('name'))
                     except ObjectDoesNotExist:
                         unknown.append(m.get('name'))
-        return (known, unknown)
+    return known, unknown
 
 
-def check_api_answer(api_answer):
-    check_parameters = ['type', 'name']
 @permission_required('ludorecherche.add_game') # decorator checking if user have right to add game
 def add_a_game(request, game_id):  # Register selected game from page to database if not present
     context = base(request)
@@ -109,12 +108,12 @@ def add_a_game(request, game_id):  # Register selected game from page to databas
             })
             return render(request, 'ludogestion/find_a_game.html', context)
         elif api_answer.get('type') == 'game':
-            Game.objects.get(name=api_answer['name'])
+            Game.objects.get(name=api_answer.get('name'))
         elif api_answer.get('type') == 'expansion':
             try:
-                AddOn.objects.get(name=api_answer['name'])
+                AddOn.objects.get(name=api_answer.get('name'))
             except ObjectDoesNotExist:
-                MultiAddOn.objects.get(name=api_answer['name'])
+                MultiAddOn.objects.get(name=api_answer.get('name'))
         context.update({
             'message': 'Ce jeu est déjà dans la ludothèque',
         })
@@ -279,6 +278,7 @@ def register_main(table, form):
     add_list(entry, Language, "language", form, entry.language)
     return entry
 
+
 def add_list(entry, model, name, form, field):
     add_list = form.data.getlist(name, [])
     unknown = form.data.get(f"add_{name}", "")
@@ -350,8 +350,8 @@ def register_a_game(request):
             return render(request, 'ludogestion/add_a_game.html', context)
         except ObjectDoesNotExist:
             multi_add_on = register_main(MultiAddOn, add_form)
-        if add_form.data.get("associated_game"):
-            multi_add_on.games.add(Game.objects.get(name=add_form.data.get('associated_game')))
+        if add_form.data.get("associated_games"):
+            [multi_add_on.games.add(Game.objects.get(name=game)) for game in add_form.data.getlist('associated_games')]
             multi_add_on.save()
     context.update({
         'message': 'Enregistrement réalisé avec succès',
