@@ -112,14 +112,20 @@ footer > div > div:hover > div, footer > div > div > div:hover{
 
 }
 
+h1+h3{
+    text-align: center;
+}
+
+.reservation td,.reservation th, .reservation tr, .reservation{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
 .reservation{
-    border: 1px solid black;
-    border-collapse: collapse;
+    padding:0;
+    margin:auto;
 }
-.reservation td,.reservation th{
-    border: 1px solid black;
-    border-collapse: collapse;
-}
+
 .reservation tr > td:last-of-type{
     text-align: center;
 }
@@ -156,6 +162,12 @@ footer > div > div:hover > div > a > button{
     border-radius:20px;
 
 }
+
+.success, .failure{
+    text-align: center;
+}
+
+
 
 footer  button{
     width:50px;
@@ -414,12 +426,13 @@ ul.list_game > li > a > button{
     text-align: center;
 }
 
-#detail_image {
-    animation: apparition 3s linear;
-}
 
 #add_bar{
     padding:20px;
+}
+
+.add_a_game_button{
+    text-align: center;
 }
 
 .news{

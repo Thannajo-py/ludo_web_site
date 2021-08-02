@@ -122,6 +122,7 @@ def add_on_detail(request, add_on_pk):
 
 def lucky(request):
     games = Game.objects.all()
+    print(Game.objects.get(name="Pix").designers.all())
     game = games[randint(0, len(games) - 1)]
     return detail(request, game.pk)
 
@@ -239,8 +240,7 @@ def get_data_or_default(expression, value, default_value):  # check if field is 
 
 def advanced_search(request):  # search through database for specific games with multifactorial criteria
     context = base(request)
-    form = SearchAdvForm(request.GET)
-    form.data("language")
+    form = SearchAdvForm(request.POST)
     language = get_data_or_default(form.data, 'language', "").lower()
     query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
     difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])

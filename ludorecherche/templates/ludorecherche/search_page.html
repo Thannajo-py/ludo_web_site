@@ -2,7 +2,8 @@
 {% block content %}
 <h1>{{interface.theme.advanced_search_title}}</h1>
 
-  <form class="advanced" action="{% url 'ludorecherche:advanced_search'%}" method="get">
+  <form class="advanced" action="{% url 'ludorecherche:advanced_search'%}" method="POST">
+  {% csrf_token %}
 
     <table class="search_table">
       <tbody>
@@ -41,7 +42,7 @@
       </td>
     </tr>
     <tr>
-      <td><label for="{{ search_form.playing_mode_choice.id_for_label }}" "><i class="fas fa-chess-knight"></i>Type de jeu</label></td>
+      <td><label for="{{ search_form.playing_mode_choice.id_for_label }}"><i class="fas fa-chess-knight"></i>Type de jeu</label></td>
       <td >
         {{search_form.playing_mode}}
       </td>

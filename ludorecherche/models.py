@@ -4,17 +4,36 @@ from django.db import models
 from colorfield.fields import ColorField
 
 
-class Designer(models.Model):
+class CompareByName:
     name = models.CharField('nom', max_length=200, unique=True)
-
-    class Meta:
-        verbose_name = "auteur"
 
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        return self.name == other.name
 
-class Tag(models.Model):
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __gt__(self, other):
+        return self.name > other.name
+
+    class Meta:
+        abstract = True
+
+
+class Designer(models.Model, CompareByName):
+    name = models.CharField('nom', max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "auteur"
+
+
+class Tag(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -24,7 +43,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Mechanism(models.Model):
+class Mechanism(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -35,7 +54,7 @@ class Mechanism(models.Model):
         return self.name
 
 
-class Topic(models.Model):
+class Topic(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -46,7 +65,7 @@ class Topic(models.Model):
         return self.name
 
 
-class Difficulty(models.Model):
+class Difficulty(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -56,7 +75,7 @@ class Difficulty(models.Model):
         return self.name
 
 
-class Artist(models.Model):
+class Artist(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -66,7 +85,7 @@ class Artist(models.Model):
         return self.name
 
 
-class Publisher(models.Model):
+class Publisher(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -76,7 +95,7 @@ class Publisher(models.Model):
         return self.name
 
 
-class PlayingMode(models.Model):
+class PlayingMode(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -87,7 +106,7 @@ class PlayingMode(models.Model):
         return self.name
 
 
-class Language(models.Model):
+class Language(models.Model, CompareByName):
     name = models.CharField('nom', max_length=200, unique=True)
 
     class Meta:
@@ -99,7 +118,7 @@ class Language(models.Model):
 
 class GameAddOnMultiAddOnCommonBase(models.Model):
     name = models.CharField('nom', max_length=200, unique=True)
-    english_name = models.CharField('nom anglais', max_length=200, unique=True,null=True, blank=True)
+    english_name = models.CharField('nom anglais', max_length=200, null=True, blank=True)
     player_min = models.IntegerField('nombre de joueur minimum', null=True, blank=True)
     player_max = models.IntegerField('nombre de joueur maximum', null=True, blank=True)
     playing_time = models.CharField('durée de jeu', max_length=50, null=True, blank=True)
@@ -112,7 +131,7 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
     designers = models.ManyToManyField(Designer, verbose_name='Auteur', blank=True)
     artists = models.ManyToManyField(Artist, verbose_name='illustrateur', blank=True)
     publishers = models.ManyToManyField(Publisher, verbose_name='éditeur', blank=True)
-    bgg_link = models.TextField("URL de BGG ou Tric Trac ", blank=True)
+    bgg_link = models.TextField("URL de BGG ou Tric Trac ", blank=True, null=True)
     playing_mode = models.ManyToManyField(PlayingMode, verbose_name='type', blank=True)
     language = models.ManyToManyField(Language, verbose_name='langue', blank=True)
     age = models.IntegerField('âge', blank=True, null=True)
@@ -124,8 +143,8 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
         abstract = True
 
 
-class Game(GameAddOnMultiAddOnCommonBase):
-    by_player = models.BooleanField('temps de jeu défini par joueur ?', default=False)
+class Game(GameAddOnMultiAddOnCommonBase, CompareByName):
+    by_player = models.BooleanField('temps de jeu défini par joueur ?', blank=True, null=True)
     tag = models.ManyToManyField(Tag, verbose_name='étiquettes', related_name='games', blank=True)
     mechanism = models.ManyToManyField(Mechanism, verbose_name='mécaniques associées', related_name='games', blank=True)
     topic = models.ManyToManyField(Topic, verbose_name='thèmes associés', related_name='games', blank=True)
