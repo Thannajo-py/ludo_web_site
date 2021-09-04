@@ -39,6 +39,7 @@ ALLOWED_HOSTS = ['https://fil-rouge-fad-dev-310121ja.herokuapp.com/']
 # Application definition
 
 INSTALLED_APPS = [
+    'API.apps.ApiConfig',
     'ludoaccueil.apps.LudoaccueilConfig',
     'ludogestion.apps.LudogestionConfig',
     'ludorecherche.apps.LudorechercheConfig',
