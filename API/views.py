@@ -33,7 +33,8 @@ def make_subDic(game, subDic):
 def getAll(request):
     if request.method == 'GET':
         games = [game for game in Game.objects.all()]
-        add_ons = [add_on for add_on in MultiAddOn.objects.all()]
+        multi_add_ons = [add_on for add_on in MultiAddOn.objects.all()]
+        add_ons = [add_on for add_on in AddOn.objects.all()]
         dic_all = {'games': [
             make_subDic(game, {
              'by_player': game.by_player,
@@ -48,8 +49,9 @@ def getAll(request):
                                'games': [source_game.name for source_game in multi_add_on.games.all()],
                                }) for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
              }) for game in games],
-        'add_ons':[make_subDic(add_on, {
+        'multi_add_ons':[make_subDic(add_on, {
                    'games': [game.name for game in add_on.games.all()]
-                   }) for add_on in add_ons],
+                   }) for add_on in multi_add_ons],
+            'add_ons':[make_subDic(add_on, {}) for add_on in add_ons]
         }
         return Response(dic_all)
