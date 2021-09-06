@@ -33,6 +33,7 @@ def make_subDic(game, subDic):
 def getAll(request):
     if request.method == 'GET':
         games = [game for game in Game.objects.all()]
+        add_ons = [add_on for add_on in AddOn.objects.all()]
         dic_all = {'games': [
             make_subDic(game, {
              'by_player': game.by_player,
@@ -49,6 +50,6 @@ def getAll(request):
              }) for game in games],
         'add_ons':[make_subDic(add_on, {
                    'game': add_on.game.name
-                   }) for add_on in AddOn.objects.all()],
+                   }) for add_on in add_ons],
         }
         return Response(dic_all)
