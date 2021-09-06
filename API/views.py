@@ -52,6 +52,6 @@ def getAll(request):
         'multi_add_ons':[make_subDic(add_on, {
                    'games': [game.name for game in add_on.games.all()]
                    }) for add_on in multi_add_ons],
-            'add_ons':[make_subDic(add_on, {'game': add_on.game.name}) for add_on in add_ons]
+            'add_ons':[make_subDic(add_on, {'game': add_on.game.name }) for add_on in add_ons if add_on.game is not None]
         }
         return Response(dic_all)
