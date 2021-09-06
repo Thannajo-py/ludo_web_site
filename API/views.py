@@ -30,21 +30,29 @@ def make_subDic(game, subDic):
 
 
 @api_view(['GET'])
-def getGames(request):
+def getAll(request):
     if request.method == 'GET':
         games = [game for game in Game.objects.all()]
-        dicGames = [
-            make_subDic(game,{
+        dic_all = {
+            'games':[
+            make_subDic(game, {
              'by_player': game.by_player,
              'tags': [tag.name for tag in game.tag.all()],
              'topics': [topic.name for topic in game.topic.all()],
              'mechanism': [mechanism.name for mechanism in game.mechanism.all()],
              'add_on':
-                 [make_subDic(add_on,{
+                 [make_subDic(add_on, {
                    'game': add_on.game.name
                    }) for add_on in AddOn.objects.filter(game_id=game.pk)],
              'multi_add_on': [make_subDic(multi_add_on,{
                                'games': [source_game.name for source_game in multi_add_on.games.all()],
                                }) for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
-             }) for game in games]
-        return Response(dicGames)
+             }) for game in games],
+            'add_ons': [make_subDic(add_on, {
+                   'game': add_on.game.name
+                   }) for add_on in AddOn.objects.all()],
+            'multi_add_ons': [make_subDic(multi_add_on,{
+                               'games': [source_game.name for source_game in multi_add_on.games.all()],
+                               }) for multi_add_on in MultiAddOn.objects.all()]
+        }
+        return Response(dic_all)
