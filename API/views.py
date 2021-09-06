@@ -46,5 +46,9 @@ def getAll(request):
              'multi_add_on': [make_subDic(multi_add_on,{
                                'games': [source_game.name for source_game in multi_add_on.games.all()],
                                }) for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
-             }) for game in games]}
+             }) for game in games],
+        'add_ons':[make_subDic(add_on, {
+                   'game': add_on.game.name
+                   }) for add_on in AddOn.objects.all()],
+        }
         return Response(dic_all)
