@@ -8,22 +8,24 @@ from ludorecherche.models import Game, AddOn, MultiAddOn
 
 
 def make_subDic(game, subDic):
-    this_dic = {'name': game.name,
-                   'english_name': game.english_name,
-                   'player_min': game.player_min,
-                   'player_max': game.player_max,
-                   'playing_time': game.playing_time,
-                   'difficulty': game.difficulty.name if game.difficulty else None,
-                   'designers': [designer.name for designer in game.designers.order_by('name')],
-                   'artists': [artist.name for artist in game.artists.order_by('name')],
-                   'publishers': [publisher.name for publisher in game.publishers.order_by('name')],
-                   'bgg_link': game.bgg_link,
-                   'playing_mode': [playing_mode.name for playing_mode in game.playing_mode.order_by('name')],
-                   'language': [language.name for language in game.language.order_by('name')],
-                   'age': game.age,
-                   'buying_price': game.buying_price,
-                   'stock': game.stock,
-                   'max_time': game.max_time,
+    this_dic = {
+                'id': game.pk,
+                'name': game.name,
+                'english_name': game.english_name,
+                'player_min': game.player_min,
+                'player_max': game.player_max,
+                'playing_time': game.playing_time,
+                'difficulty': game.difficulty.name if game.difficulty else None,
+                'designers': [designer.name for designer in game.designers.order_by('name')],
+                'artists': [artist.name for artist in game.artists.order_by('name')],
+                'publishers': [publisher.name for publisher in game.publishers.order_by('name')],
+                'bgg_link': game.bgg_link,
+                'playing_mode': [playing_mode.name for playing_mode in game.playing_mode.order_by('name')],
+                'language': [language.name for language in game.language.order_by('name')],
+                'age': game.age,
+                'buying_price': game.buying_price,
+                'stock': game.stock,
+                'max_time': game.max_time,
                    }
     this_dic.update(subDic)
     return this_dic
