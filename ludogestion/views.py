@@ -17,8 +17,9 @@ from .models import Reservation, ReservationRule
 from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 
 
-
 CLIENT_ID = "JLBr5npPhV"
+
+
 def base(request):  # give the basic context of each page
     authentified = False
     form = LogInForm()
