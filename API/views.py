@@ -31,6 +31,7 @@ def make_sub_dic(game, subDic):
                 'buying_price': game.buying_price,
                 'stock': game.stock,
                 'max_time': game.max_time,
+                'external_img': game.external_image
                    }
     this_dic.update(subDic)
     return this_dic
