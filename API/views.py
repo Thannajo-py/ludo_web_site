@@ -213,7 +213,7 @@ def delete_dispatch(deleted_content: dict):
 @transaction.atomic
 def synchronize_change(request):
     if request.method == "POST":
-        body = json.loads(request.POST.get('body'))
+        body = json.loads(request.body).get('body')
         username = body.get('login')
         password = body.get('password')
         user = authenticate(request, username=username, password=password)
