@@ -89,7 +89,7 @@ def common_field_fill(db_class, added_content, field, type_object):
                         bgg_link=game.get('bgg_link', None),
                         age=get_int(game.get('age')),
                         max_time=get_int(game.get('max_playtime')),
-                        stock=get_int(game.get('stock', None)),
+                        stock=get_int(game.get('stock', 1)),
                         buying_price=get_int(game.get('buying_price', None))
                     )
                     common_object_fill(game, new_game, type_object)
