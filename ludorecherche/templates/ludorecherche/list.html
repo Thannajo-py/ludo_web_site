@@ -15,7 +15,7 @@
                         <img  src="{{game.external_image}}" alt="{{ game.name }}">
                     {% endif %}
                 </div>
-                <h3><a href="{% url 'ludorecherche:detail' game_pk=game.pk %}">{{ game.name }} {{ game.id }}</a></h3>
+                <h3><a href="{% url 'ludorecherche:detail' game_pk=game.pk %}">{{ game.name }}</a></h3>
                 {% for designer in game.designers.all|slice:":2" %}
                     <p>{{ designer.name }}</p>
                 {% endfor %}
