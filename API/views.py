@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -6,13 +5,13 @@ from django.db import transaction
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from ludorecherche.models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, Language, PlayingMode, Difficulty,\
-Tag, Mechanism, Topic
+from ludorecherche.models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, Language, PlayingMode, \
+    Difficulty, Tag, Mechanism, Topic
 
 import json
 
 
-def make_sub_dic(game, subDic):
+def make_sub_dic(game, sub_dic):
     this_dic = {
                 'id': game.pk,
                 'name': game.name,
@@ -33,7 +32,7 @@ def make_sub_dic(game, subDic):
                 'max_time': game.max_time,
                 'external_img': game.external_image
                    }
-    this_dic.update(subDic)
+    this_dic.update(sub_dic)
     return this_dic
 
 
@@ -47,18 +46,17 @@ def get_all():
          'tags': [tag.name for tag in game.tag.order_by('name')],
          'topics': [topic.name for topic in game.topic.order_by('name')],
          'mechanism': [mechanism.name for mechanism in game.mechanism.order_by('name')],
-         'add_on':
-             [make_sub_dic(add_on, {
+         'add_on': [make_sub_dic(add_on, {
                'game': add_on.game.name
                }) for add_on in AddOn.objects.filter(game_id=game.pk)],
          'multi_add_on': [make_sub_dic(multi_add_on, {
                            'games': [source_game.name for source_game in multi_add_on.games.order_by('name')],
                            }) for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
          }) for game in games],
-    'multi_add_ons':[make_sub_dic(add_on, {
+        'multi_add_ons': [make_sub_dic(add_on, {
                'games': [game.name for game in add_on.games.order_by('name')]
                }) for add_on in multi_add_ons],
-        'add_ons':[make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None]
+        'add_ons': [make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None]
     }
     return dic_all
 
@@ -73,7 +71,7 @@ def get_int(content):
 
 
 def common_field_fill(db_class, added_content, field, type_object):
-    if (added_content):
+    if added_content:
         games = added_content.get(field)
         if type(games) == list:
             for game in games:
@@ -87,11 +85,12 @@ def common_field_fill(db_class, added_content, field, type_object):
                         player_min=get_int(game.get('player_min')),
                         player_max=get_int(game.get('player_max')),
                         playing_time=game.get('playing_time'),
-                        bgg_link=game.get('bgg_link', None),
+                        bgg_link=game.get('bgg_link'),
                         age=get_int(game.get('age')),
                         max_time=get_int(game.get('max_playtime')),
                         stock=get_int(game.get('stock', 1)),
-                        buying_price=get_int(game.get('buying_price', None))
+                        external_image=game.get('external_img'),
+                        buying_price=get_int(game.get('buying_price')),
                     )
                     common_object_fill(game, new_game, type_object)
                     new_game.save()
@@ -162,7 +161,7 @@ def add_dispatch(added_content):
     late_common_object_fill(added_content)
 
 
-def common_field_change(db_object, new_object:dict, type_object):
+def common_field_change(db_object, new_object: dict, type_object):
     db_object.name = new_object.get('name')
     db_object.english_name = new_object.get('english_name')
     db_object.player_min = get_int(new_object.get('player_min'))
@@ -171,8 +170,9 @@ def common_field_change(db_object, new_object:dict, type_object):
     db_object.bgg_link = new_object.get('bgg_link')
     db_object.age = new_object.get('age')
     db_object.buying_price = get_int(new_object.get('buying_price'))
-    db_object.stock = get_int(new_object.get('stock'))
+    db_object.stock = get_int(new_object.get('stock', 1))
     db_object.max_time = get_int(new_object.get('max_time'))
+    db_object.external_image = new_object.get('external_img')
     common_object_fill(new_object, db_object, type_object)
 
 
@@ -186,7 +186,7 @@ def list_object_from_dict(list_object, db_class, type_object):
                 continue
 
 
-def modify_dispatch(modified_content:dict):
+def modify_dispatch(modified_content: dict):
     list_object_from_dict(modified_content.get('games'), Game, game_type())
     list_object_from_dict(modified_content.get('add_ons'), AddOn, add_on_type())
     list_object_from_dict(modified_content.get('multi_add_ons'), MultiAddOn, multi_add_on_type())
@@ -209,7 +209,6 @@ def delete_dispatch(deleted_content: dict):
     delete_from_db(deleted_content.get('multi_add_ons'), MultiAddOn)
 
 
-
 @api_view(['POST'])
 @transaction.atomic
 def synchronize_change(request):
@@ -219,18 +218,18 @@ def synchronize_change(request):
         password = body.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            added_content = body.get('addedList')
-            if type(added_content) == dict:
-                add_dispatch(added_content)
-            modified_content = body.get('modifiedList')
-            if type(modified_content) == dict:
-                modify_dispatch(modified_content)
-            deleted_content = body.get('deletedList')
-            if type(deleted_content) == dict:
-                delete_dispatch(deleted_content)
+            if user.has_perm('ludorecherche.add_Game') and \
+                    user.has_perm('ludorecherche.change_Game') and \
+                    user.has_perm('ludorecherche.delete_Game'):
+                added_content = body.get('addedList')
+                if type(added_content) == dict:
+                    add_dispatch(added_content)
+                modified_content = body.get('modifiedList')
+                if type(modified_content) == dict:
+                    modify_dispatch(modified_content)
+                deleted_content = body.get('deletedList')
+                if type(deleted_content) == dict:
+                    delete_dispatch(deleted_content)
             return Response(get_all())
         else:
             return Response({'error': 'wrong credential'})
-
-
-
