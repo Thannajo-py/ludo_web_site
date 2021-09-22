@@ -30,7 +30,8 @@ def make_sub_dic(game, sub_dic):
                 'buying_price': game.buying_price,
                 'stock': game.stock,
                 'max_time': game.max_time,
-                'external_img': game.external_image
+                'external_img': game.external_image,
+                'picture': game.picture
                    }
     this_dic.update(sub_dic)
     return this_dic
