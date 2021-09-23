@@ -217,16 +217,20 @@ def synchronize_change(request):
                     user.has_perm('ludorecherche.change_Game') and \
                     user.has_perm('ludorecherche.delete_Game'):
                 deleted_content = body.get('deletedList')
-                delete_dispatch(deleted_content)
+                if type(deleted_content) == dict:
+                    delete_dispatch(deleted_content)
 
                 modified_content = body.get('modifiedList')
-                modify_dispatch(modified_content)
+                if type(modified_content) == dict:
+                    modify_dispatch(modified_content)
 
                 added_content = body.get('addedList')
-                add_dispatch(added_content)
-                late_common_object_fill(added_content)
+                if type(added_content) == dict:
+                    add_dispatch(added_content)
+                    late_common_object_fill(added_content)
 
-                late_common_object_fill(modified_content)
+                if type(modified_content) == dict:
+                    late_common_object_fill(modified_content)
 
             return Response(get_all())
         else:
