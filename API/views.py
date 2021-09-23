@@ -159,7 +159,6 @@ def add_dispatch(added_content):
     common_field_fill(Game, added_content, 'games', game_type())
     common_field_fill(AddOn, added_content, 'add_ons', add_on_type())
     common_field_fill(MultiAddOn, added_content, 'multi_add_ons', multi_add_on_type())
-    late_common_object_fill(added_content)
 
 
 def common_field_change(db_object, new_object: dict, type_object):
@@ -191,7 +190,6 @@ def modify_dispatch(modified_content: dict):
     list_object_from_dict(modified_content.get('games'), Game, game_type())
     list_object_from_dict(modified_content.get('add_ons'), AddOn, add_on_type())
     list_object_from_dict(modified_content.get('multi_add_ons'), MultiAddOn, multi_add_on_type())
-    late_common_object_fill(modified_content)
 
 
 def delete_from_db(list_object, db_class):
@@ -222,15 +220,22 @@ def synchronize_change(request):
             if user.has_perm('ludorecherche.add_Game') and \
                     user.has_perm('ludorecherche.change_Game') and \
                     user.has_perm('ludorecherche.delete_Game'):
-                added_content = body.get('addedList')
-                if type(added_content) == dict:
-                    add_dispatch(added_content)
-                modified_content = body.get('modifiedList')
-                if type(modified_content) == dict:
-                    modify_dispatch(modified_content)
                 deleted_content = body.get('deletedList')
                 if type(deleted_content) == dict:
                     delete_dispatch(deleted_content)
+
+                modified_content = body.get('modifiedList')
+                if type(modified_content) == dict:
+                    modify_dispatch(modified_content)
+
+                added_content = body.get('addedList')
+                if type(added_content) == dict:
+                    add_dispatch(added_content)
+                    late_common_object_fill(added_content)
+
+                if type(modified_content) == dict:
+                    late_common_object_fill(modified_content)
+
             return Response(get_all())
         else:
             return Response({'error': 'wrong credential'})
