@@ -47,12 +47,8 @@ def get_all():
          'tags': [tag.name for tag in game.tag.order_by('name')],
          'topics': [topic.name for topic in game.topic.order_by('name')],
          'mechanism': [mechanism.name for mechanism in game.mechanism.order_by('name')],
-         'add_on': [make_sub_dic(add_on, {
-               'game': add_on.game.name
-               }) for add_on in AddOn.objects.filter(game_id=game.pk)],
-         'multi_add_on': [make_sub_dic(multi_add_on, {
-                           'games': [source_game.name for source_game in multi_add_on.games.order_by('name')],
-                           }) for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
+         'add_on': [add_on.name for add_on in AddOn.objects.filter(game_id=game.pk)],
+         'multi_add_on': [multi_add_on.name for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
          }) for game in games],
         'multi_add_ons': [make_sub_dic(add_on, {
                'games': [game.name for game in add_on.games.order_by('name')]
