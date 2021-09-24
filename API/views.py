@@ -177,7 +177,12 @@ def list_object_from_dict(list_object, db_class, type_object):
         for data_object in list_object:
             try:
                 db_data = db_class.objects.get(pk=data_object.get('id'))
-                common_field_change(db_data, data_object, type_object)
+                try:
+                    db_destination = db_class.objects.get(name=data_object.get('name'))
+                    if db_destination.pk == db_data.pk:
+                        common_field_change(db_data, data_object, type_object)
+                except ObjectDoesNotExist:
+                    common_field_change(db_data, data_object, type_object)
             except ObjectDoesNotExist:
                 continue
 
