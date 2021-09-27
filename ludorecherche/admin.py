@@ -21,7 +21,7 @@ class GameAdmin(admin.ModelAdmin):
     inlines = [MultiAddOnGameInline, ]
     list_display = ['name', ]
     ordering = ['name']
-    #exclude = ['modified_at']
+    exclude = ['modified_at']
 
 
 @admin.register(Language)
@@ -212,6 +212,11 @@ class MechanismAdmin(admin.ModelAdmin):
     ordering = ['name']
     inlines = [GameMechanismInline, ]
 
+
 @admin.register(DeletedGames)
 class DeletedGamesAdmin(admin.ModelAdmin):
-    pass
+    def has_add_permission(self, request):  # custom permission denied
+        return False
+
+    def has_view_or_change_permission(self, request, obj=None):  # custom permission denied
+        return False
