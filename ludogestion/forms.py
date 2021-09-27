@@ -1,12 +1,12 @@
 from django import forms
-"""from ludorecherche.models import Difficulty, Designer, Artist, Publisher, PlayingMode, Language, Tag, Mechanism, Topic, Game"""
+from ludorecherche.models import Difficulty, Designer, Artist, Publisher, PlayingMode, Language, Tag, Mechanism, Topic, Game
 
 
 def list_ordered(entry):
     return sorted([(element, element) for element in entry.objects.all()])
 
 
-"""DIFFICULTY_CHOICE = list_ordered(Difficulty)
+DIFFICULTY_CHOICE = list_ordered(Difficulty)
 DESIGNERS = list_ordered(Designer)
 ARTISTS = list_ordered(Artist)
 PUBLISHERS = list_ordered(Publisher)
@@ -17,7 +17,7 @@ DIFFICULTY_CHOICES = list_ordered(Difficulty)
 TAG_CHOICES = list_ordered(Tag)
 MECHANISM_CHOICES = list_ordered(Mechanism)
 TOPIC_CHOICES = list_ordered(Topic)
-GAME_CHOICES = list_ordered(Game)"""
+GAME_CHOICES = list_ordered(Game)
 
 
 class LogInForm(forms.Form):  # the log in form
@@ -28,7 +28,7 @@ class LogInForm(forms.Form):  # the log in form
 class AddAGameForm(forms.Form):  # add a game
     name = forms.CharField(label="nom", widget=forms.TextInput(), required=False)
     english_name = forms.CharField(label="nom anglais", widget=forms.TextInput(), required=False)
-    """designer = forms.MultipleChoiceField(label="auteurs", choices=DESIGNERS, required=False)
+    designer = forms.MultipleChoiceField(label="auteurs", choices=DESIGNERS, required=False)
     add_designer = forms.CharField(label="auteur non recensés", widget=forms.TextInput(), required=False)
     artist = forms.MultipleChoiceField(label="illustrateurs", choices=ARTISTS, required=False)
     add_artist = forms.CharField(label="illustrateurs non recensés", widget=forms.TextInput(), required=False)
@@ -69,4 +69,4 @@ class AddAGameForm(forms.Form):  # add a game
     associated_game = forms.ChoiceField(label="jeu associé", widget=forms.Select(attrs={'class': 'add-on-only'}),
                                         choices=GAME_CHOICES, required=False)
     associated_games = forms.MultipleChoiceField(widget=forms.SelectMultiple(attrs={'class': 'multi-add-on-only'}),
-                                                 label="jeux associés", choices=GAME_CHOICES, required=False)"""
+                                                 label="jeux associés", choices=GAME_CHOICES, required=False)
