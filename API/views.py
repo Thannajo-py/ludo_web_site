@@ -42,7 +42,7 @@ def make_sub_dic(game, sub_dic):
     return this_dic
 
 
-def get_all(timestamp):
+def get_all(timestamp, new_timestamp):
     games = [game for game in Game.objects.order_by('name')]
     multi_add_ons = [add_on for add_on in MultiAddOn.objects.order_by('name')]
     add_ons = [add_on for add_on in AddOn.objects.order_by('name')]
@@ -59,13 +59,13 @@ def get_all(timestamp):
                'games': [game.name for game in add_on.games.order_by('name')]
                }) for add_on in multi_add_ons],
         'add_ons': [make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None],
-        'timestamp': timestamp
+        'timestamp': new_timestamp
     }
     return dic_all
 
 
-def get_last_change(timestamp):
-    games = [game for game in Game.objects.filter(modified_at__gt=timestamp).order_by('name')]
+def get_last_change(timestamp, new_timestamp):
+    games = [game for game in Game.objects.filter(modified_at__gte=timestamp).order_by('name')]
     multi_add_ons = [add_on for add_on in MultiAddOn.objects.filter(modified_at__gt=timestamp).order_by('name')]
     add_ons = [add_on for add_on in AddOn.objects.filter(modified_at__gt=timestamp).order_by('name')]
     deleted_games = [game for game in DeletedGames.objects.filter(created_at__gt=timestamp,
@@ -90,7 +90,7 @@ def get_last_change(timestamp):
         'deleted_games': [game.deleted_id for game in deleted_games],
         'deleted_add_ons': [game.deleted_id for game in deleted_add_ons],
         'deleted_multi_add_ons': [game.deleted_id for game in deleted_multi_add_ons],
-        'timestamp': timestamp
+        'timestamp': new_timestamp
     }
     return dic_all
 
@@ -271,9 +271,9 @@ def synchronize_change(request):
 
             new_timestamp = time.time()
             if body.get('timestamp') is None:
-                return Response(get_all(new_timestamp))
+                return Response(get_all(0.0, new_timestamp))
             else:
-                return Response(get_last_change(new_timestamp))
+                return Response(get_last_change(body.get('timestamp'), new_timestamp))
 
         else:
             return Response({'error': 'wrong credential'})
