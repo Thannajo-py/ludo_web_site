@@ -87,9 +87,9 @@ def get_last_change(timestamp):
                'games': [game.name for game in add_on.games.order_by('name')]
                }) for add_on in multi_add_ons],
         'add_ons': [make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None],
-        'deleted_games': [{'id': game.deleted_id} for game in deleted_games],
-        'deleted_add_ons': [{'id': game.deleted_id} for game in deleted_add_ons],
-        'deleted_multi_add_ons': [{'id': game.deleted_id} for game in deleted_multi_add_ons],
+        'deleted_games': [game.deleted_id for game in deleted_games],
+        'deleted_add_ons': [game.deleted_id for game in deleted_add_ons],
+        'deleted_multi_add_ons': [game.deleted_id for game in deleted_multi_add_ons],
         'timestamp': timestamp
     }
     return dic_all
