@@ -1,7 +1,12 @@
+import time
+
+
 from django.db import models
 
 
 from colorfield.fields import ColorField
+
+from API.constant import game_type, add_on_type, multi_add_on_type
 
 
 class CompareByName:
@@ -138,9 +143,21 @@ class GameAddOnMultiAddOnCommonBase(models.Model):
     buying_price = models.IntegerField("prix d'achat", null=True, blank=True)
     stock = models.IntegerField("Quantité", default=1)
     max_time = models.IntegerField('temps de jeu maximum', null=True, blank=True)
+    modified_at = models.FloatField("Dernière modification", default=1632726591.3455303)
 
     class Meta:
         abstract = True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.modified_at = time.time()
+        models.Model.save(self, force_insert, force_update, using,
+             update_fields)
+
+    def delete(self, using=None, keep_parents=False):
+        product_type = game_type() if type(self) == Game else add_on_type() if type(self) == AddOn else multi_add_on_type()
+        DeletedGames.objects.create(deleted_id=self.pk, product_type=product_type, created_at=time.time())
+        models.Model.delete(self, using, keep_parents)
 
 
 class Game(GameAddOnMultiAddOnCommonBase, CompareByName):
@@ -221,3 +238,9 @@ class Background(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+
+class DeletedGames(models.Model):
+    deleted_id = models.IntegerField("id supprimé")
+    product_type = models.CharField('type', max_length=50)
+    created_at = models.FloatField("timestamp de suppression", default=1632726591.3455303)

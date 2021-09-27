@@ -1,14 +1,14 @@
 from django import forms
 
 
-from ludogestion.forms import PLAYING_MODE_CHOICES, LANGUAGES_CHOICES, DIFFICULTY_CHOICES, TAG_CHOICES, \
-    MECHANISM_CHOICES, TOPIC_CHOICES
+"""from ludogestion.forms import PLAYING_MODE_CHOICES, LANGUAGES_CHOICES, DIFFICULTY_CHOICES, TAG_CHOICES, \
+    MECHANISM_CHOICES, TOPIC_CHOICES"""
 
 
 class SearchAdvForm(forms.Form):  # form used in advanced search
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'search_text'}), required=False)
     designer = forms.CharField(widget=forms.TextInput(attrs={'class': 'search_text'}), required=False)
-    artist = forms.CharField(widget=forms.TextInput(attrs={'class': 'search_text'}), required=False)
+    """artist = forms.CharField(widget=forms.TextInput(attrs={'class': 'search_text'}), required=False)
     publisher = forms.CharField(widget=forms.TextInput(attrs={'class': 'search_text'}), required=False)
     tag = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'select'}),
                                     choices=TAG_CHOICES, required=False)
@@ -25,3 +25,4 @@ class SearchAdvForm(forms.Form):  # form used in advanced search
                                                     choices=TOPIC_CHOICES)
     mechanism = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(attrs={'class': 'select'}),
                                                     choices=MECHANISM_CHOICES)
+"""

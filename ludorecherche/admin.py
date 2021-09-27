@@ -2,7 +2,7 @@ from django.contrib import admin
 
 
 from .models import Game, Designer, Artist, Publisher, AddOn, Language, PlayingMode, \
-    Difficulty, Tag, MultiAddOn, Theme, Background, Topic, Mechanism
+    Difficulty, Tag, MultiAddOn, Theme, Background, Topic, Mechanism, DeletedGames
 # What the admin can do and can't do
 
 
@@ -21,6 +21,7 @@ class GameAdmin(admin.ModelAdmin):
     inlines = [MultiAddOnGameInline, ]
     list_display = ['name', ]
     ordering = ['name']
+    #exclude = ['modified_at']
 
 
 @admin.register(Language)
@@ -119,6 +120,7 @@ class AddOnAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_display = ('name',)
     ordering = ['name']
+    exclude = ['modified_at']
 
 
 @admin.register(Difficulty)
@@ -152,6 +154,7 @@ class MultiAddOnAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_display = ('name',)
     ordering = ['name']
+    exclude = ['modified_at']
 
 
 @admin.register(Theme)
@@ -208,3 +211,7 @@ class MechanismAdmin(admin.ModelAdmin):
     list_display = ('name',)
     ordering = ['name']
     inlines = [GameMechanismInline, ]
+
+@admin.register(DeletedGames)
+class DeletedGamesAdmin(admin.ModelAdmin):
+    pass
