@@ -105,20 +105,20 @@ def common_field_fill(db_class, added_content, field, type_object):
         if type(games) == list:
             for game in games:
                 try:
-                    db_class.objects.get(name=game.get('name'))
+                    db_class.objects.get(name__iequal=game.get('name').strip())
                     continue
                 except ObjectDoesNotExist:
                     new_game = db_class.objects.create(
-                        name=game.get("name", ""),
-                        english_name=game.get("english_name", ""),
+                        name=game.get("name", "").strip(),
+                        english_name=game.get("english_name", "").strip(),
                         player_min=get_int(game.get('player_min')),
                         player_max=get_int(game.get('player_max')),
-                        playing_time=game.get('playing_time'),
-                        bgg_link=game.get('bgg_link'),
+                        playing_time=game.get('playing_time').strip(),
+                        bgg_link=game.get('bgg_link').strip(),
                         age=get_int(game.get('age')),
                         max_time=get_int(game.get('max_playtime')),
                         stock=get_int(game.get('stock', 1)),
-                        external_image=game.get('external_img'),
+                        external_image=game.get('external_img').strip(),
                         buying_price=get_int(game.get('buying_price')),
                     )
                     common_object_fill(game, new_game, type_object)
@@ -133,9 +133,9 @@ def common_object_fill(game, new_game, type_object):
     fill_link(game.get('playing_mode'), PlayingMode, new_game.playing_mode)
     if game.get('difficulty'):
         try:
-            new_game.difficulty = Difficulty.objects.get(name=game.get('difficulty'))
+            new_game.difficulty = Difficulty.objects.get(name__iequal=game.get('difficulty').strip())
         except ObjectDoesNotExist:
-            new_game.difficulty = Difficulty.objects.create(name=game.get('difficulty'))
+            new_game.difficulty = Difficulty.objects.create(name=game.get('difficulty').strip())
     if type_object == game_type():
         new_game.by_player = game.get('by_player') if type(game.get('by_player') == bool) else False
         fill_link(game.get('tags'), Tag, new_game.tag)
@@ -148,35 +148,37 @@ def late_common_object_fill(content):
     add_ons = content.get('add_ons')
     if type(add_ons) == list:
         for add_on in add_ons:
-            db_add_on = AddOn.objects.get(name=add_on.get('name'))
+            db_add_on = AddOn.objects.get(name__iequal=add_on.get('name').strip())
             try:
-                db_add_on.game = Game.objects.get(name=add_on.get('game'))
+                db_add_on.game = Game.objects.get(name__iequal=add_on.get('game').strip())
                 db_add_on.save()
             except ObjectDoesNotExist:
                 pass
     multi_add_ons = content.get('multi_add_ons')
     if type(multi_add_ons) == list:
         for multi_add_on in multi_add_ons:
-            db_multi_add_on = MultiAddOn.objects.get(name=multi_add_on.get('name'))
+            db_multi_add_on = MultiAddOn.objects.get(name__iequal=multi_add_on.get('name').strip())
             fill_complex_element(multi_add_on.get('games'), Game, db_multi_add_on)
 
 
 def fill_link(list_type, db_class_type, db_object):
     if type(list_type) == list:
+        db_object.clear()
         for element in list_type:
             try:
-                db_element = db_class_type.objects.get(name=element)
+                db_element = db_class_type.objects.get(name__iequal=element.strip())
                 db_object.add(db_element)
             except ObjectDoesNotExist:
-                new_element = db_class_type.objects.create(name=element)
+                new_element = db_class_type.objects.create(name=element.strip())
                 db_object.add(new_element)
 
 
 def fill_complex_element(list_type, db_class_type, db_object):
     if type(list_type) == list:
+        db_object.clear()
         for element in list_type:
             try:
-                db_element = db_class_type.objects.get(name=element)
+                db_element = db_class_type.objects.get(name__iequal=element)
                 db_object.add(db_element)
                 db_object.save()
             except ObjectDoesNotExist:
@@ -207,16 +209,17 @@ def common_field_change(db_object, new_object: dict, type_object):
 def list_object_from_dict(list_object, db_class, type_object):
     if type(list_object) == list:
         for data_object in list_object:
-            try:
-                db_data = db_class.objects.get(pk=data_object.get('id'))
+            if type(data_object) == dict:
                 try:
-                    db_destination = db_class.objects.get(name=data_object.get('name'))
-                    if db_destination.pk == db_data.pk:
+                    db_data = db_class.objects.get(pk=data_object.get('id'))
+                    try:
+                        db_destination = db_class.objects.get(name__iequal=data_object.get('name').strip())
+                        if db_destination.pk == db_data.pk:
+                            common_field_change(db_data, data_object, type_object)
+                    except ObjectDoesNotExist:
                         common_field_change(db_data, data_object, type_object)
                 except ObjectDoesNotExist:
-                    common_field_change(db_data, data_object, type_object)
-            except ObjectDoesNotExist:
-                continue
+                    continue
 
 
 def modify_dispatch(modified_content: dict):
@@ -228,11 +231,12 @@ def modify_dispatch(modified_content: dict):
 def delete_from_db(list_object, db_class):
     if type(list_object) == list:
         for data in list_object:
-            try:
-                db_data = db_class.objects.get(pk=data.get('id'))
-                db_data.delete()
-            except ObjectDoesNotExist:
-                continue
+            if type(data) == dict:
+                try:
+                    db_data = db_class.objects.get(pk=data.get('id'))
+                    db_data.delete()
+                except ObjectDoesNotExist:
+                    continue
 
 
 def delete_dispatch(deleted_content: dict):
@@ -245,35 +249,37 @@ def delete_dispatch(deleted_content: dict):
 @transaction.atomic
 def synchronize_change(request):
     if request.method == "POST":
-        body = json.loads(request.body).get('body')
-        username = body.get('login')
-        password = body.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            if user.has_perm('ludorecherche.add_Game') and \
-                    user.has_perm('ludorecherche.change_Game') and \
-                    user.has_perm('ludorecherche.delete_Game'):
-                deleted_content = body.get('deletedList')
-                if type(deleted_content) == dict:
-                    delete_dispatch(deleted_content)
+        body_response = json.loads(request.body)
+        if type(body_response) == dict:
+            body = body_response.get('body')
+            username = body.get('login')
+            password = body.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                if user.has_perm('ludorecherche.add_Game') and \
+                        user.has_perm('ludorecherche.change_Game') and \
+                        user.has_perm('ludorecherche.delete_Game'):
+                    deleted_content = body.get('deletedList')
+                    if type(deleted_content) == dict:
+                        delete_dispatch(deleted_content)
 
-                modified_content = body.get('modifiedList')
-                if type(modified_content) == dict:
-                    modify_dispatch(modified_content)
+                    modified_content = body.get('modifiedList')
+                    if type(modified_content) == dict:
+                        modify_dispatch(modified_content)
 
-                added_content = body.get('addedList')
-                if type(added_content) == dict:
-                    add_dispatch(added_content)
-                    late_common_object_fill(added_content)
+                    added_content = body.get('addedList')
+                    if type(added_content) == dict:
+                        add_dispatch(added_content)
+                        late_common_object_fill(added_content)
 
-                if type(modified_content) == dict:
-                    late_common_object_fill(modified_content)
+                    if type(modified_content) == dict:
+                        late_common_object_fill(modified_content)
 
-            new_timestamp = time.time()
-            if body.get('timestamp') is None:
-                return Response(get_all(0.0, new_timestamp))
+                new_timestamp = time.time()
+                if body.get('timestamp') is None:
+                    return Response(get_all(0.0, new_timestamp))
+                else:
+                    return Response(get_last_change(body.get('timestamp'), new_timestamp))
+
             else:
-                return Response(get_last_change(body.get('timestamp'), new_timestamp))
-
-        else:
-            return Response({'error': 'wrong credential'})
+                return Response({'error': 'wrong credential'})
