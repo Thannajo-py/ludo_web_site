@@ -157,6 +157,7 @@ def extend_number_of_player(game):  # check if some add_on extend the max or min
 def search(request):  # handle basic nav search
     context = base(request)
     query = request.GET.get('query')
+    print(query)
     if not query:
         games = Game.objects.all()
     else:

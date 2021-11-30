@@ -1,3 +1,9 @@
 <nav>
+    {% if perms.ludorecherche.add_game %}
     <a href="{% url 'ludogestion:find_a_game' %}"><button type="button">Ajouter un jeu</button></a>
+    {% endif %}
+    <a href="{% url 'ludogestion:log_in_page' %}"><button type="button">connexion</button></a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'ludogestion:reservation_page' %}"><button type="button">Mes réservations</button></a>
+    {% endif %}
 </nav>

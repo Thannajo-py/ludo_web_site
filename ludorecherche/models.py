@@ -244,3 +244,7 @@ class DeletedGames(models.Model):
     deleted_id = models.IntegerField("id supprimé")
     product_type = models.CharField('type', max_length=50)
     created_at = models.FloatField("timestamp de suppression", default=1632726591.3455303)
+
+    class Meta:
+        verbose_name = "jeu supprimé"
+        verbose_name_plural = "jeux supprimés"

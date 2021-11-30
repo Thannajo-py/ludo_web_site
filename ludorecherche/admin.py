@@ -218,5 +218,6 @@ class DeletedGamesAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):  # custom permission denied
         return False
 
-    def has_view_or_change_permission(self, request, obj=None):  # custom permission denied
+    def has_change_permission(self, request, obj=None):  # custom permission denied
         return False
+

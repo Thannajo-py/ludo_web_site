@@ -17,7 +17,7 @@ from .models import Reservation, ReservationRule
 from ludorecherche.views import detail, add_on_detail, multi_add_on_detail
 
 
-CLIENT_ID = "JLBr5npPhV"
+CLIENT_ID = "WgrVtRvHeo"
 
 
 def base(request):  # give the basic context of each page
@@ -51,7 +51,7 @@ def retrieve_game_from_api(request):  # build the answer API BGA page
             self.id = id
 
     query = request.GET.get('query')
-    api_answer = requests.get(f'https://api.boardgameatlas.com/api/search?name={query}&client_id={CLIENT_ID}')
+    api_answer = requests.get(f'https://api.boardgameatlas.com/api/search?name={query}&fuzzy_match=true&client_id={CLIENT_ID}')
     api_answer = json.loads(api_answer.text)
     api_answer = api_answer['games']
     api_answer = [GameAtlas(game['name'], game['thumb_url'], game['id']) for game in api_answer]

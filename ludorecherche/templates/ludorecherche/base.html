@@ -43,23 +43,24 @@
             </div>
             <div class="ludocompte_menu">
                 <div>
+                    <a href="{% url 'ludogestion:reservation_page' %}"><button type="button" {% if not user.is_authenticated %}disabled{% endif %}>Mes réservations</button></a>
                     {% if not authentified %}
                         <a href="{% url 'ludogestion:log_in_page' %}"><button type="button">Se connecter</button></a>
                     {% else %}
                         <a href="{% url 'ludogestion:log_out' %}"><button type="button">Se déconnecter</button></a>
                     {% endif %}
-                    <a href="{% url 'ludogestion:reservation_page' %}"><button type="button">Mes réservations</button></a>
                 </div>
 
                 <button type="button"><i class="fas fa-user"></i></button>
             </div>
-
+            {% if perms.ludorecherche.add_game %}
             <div class="ludogestion_menu">
                 <div>
                     <a href="{% url 'ludogestion:find_a_game' %}"><button type="button">Ajouter un jeu</button></a>
                 </div>
-                <a href="{% url 'ludogestion:find_a_game' %}"><button type="button"><i class="fas fa-lock"></i></button></a>
+                <button type="button"><i class="fas fa-lock"></i></button>
             </div>
+            {% endif %}
         </div>
 
     </footer>
