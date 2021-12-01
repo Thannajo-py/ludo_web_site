@@ -151,7 +151,7 @@
                 </ul>
             {% endif %}
             {% if authentified and stock > 0 %}
-                <div><a href="{% url 'ludogestion:add_reservation' type_name=type type_id=variable.pk %}" ><button class="option_button">Reserver</button></a></div>
+                <div><button class="option_button" onclick="link.goToAbsolute(`{% url 'ludogestion:add_reservation' type_name=type type_id=variable.pk %}`)">Reserver</button></div>
             {% endif %}
            <h3 class="comment"><b><i class="far fa-comment"></i>Commentaire:</b></h3>
             {% for comment in comments %}

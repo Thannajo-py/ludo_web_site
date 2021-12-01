@@ -21,11 +21,11 @@ nav, section, footer{
     border-radius:20px;
 }
 
-nav > a {
+nav > button {
     width:100%;
 }
 
-nav > a > button{
+nav > button{
     width:100%;
     font-size:0.75em;
     word-break: break-word;
@@ -149,7 +149,8 @@ h1+h3{
 .ludocompte_menu > div {
     top:-100px;
 }
-footer > div > div:hover > div > a > button{
+
+footer > div > div:hover > div > button{
     width:300px;
     height:50px;
 
@@ -176,7 +177,7 @@ footer  button{
     font-size: 30px;
 }
 
-footer > div > a{
+footer > div > button{
     padding:5px;
 }
 
@@ -478,12 +479,12 @@ button[type="submit"]{
         flex-direction: row;
         padding:3%;
     }
-    nav > a{
+    nav > button{
         width:14vw;
         margin-right: 5px;
         margin-left: 5px;
     }
-    nav > a > button {
+    nav > button {
         height:100%;
     }
     #searchForm{
@@ -544,7 +545,7 @@ button[type="submit"]{
     nav,.search_option{
         font-size: 20px;
     }
-    nav > a > button, footer > div > a > button{
+    nav > button, footer > div > button{
         font-size: 30px;
     }
 }

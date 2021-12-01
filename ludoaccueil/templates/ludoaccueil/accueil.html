@@ -26,8 +26,10 @@
         <li><div>
              {% if game.picture %}
                 <div><img  src="{% static 'ludorecherche/img/'%}{{game.picture}}" alt="{{ game.name }}"></div>
-            {% elif game.thumb_image %}
+            {% elif game.external_image %}
                 <div><img  src="{{game.external_image}}" alt="{{ game.name }}"></div>
+            {% elif game.thumb_image %}
+                <div><img  src="{{game.thumb_image}}" alt="{{ game.name }}"></div>
             {% endif %}
             <a href="{{game.bgg_link}}">{{game.name}}</a></div></li>
     {% endfor %}

@@ -25,29 +25,29 @@
         <div>
             <div class="ludoaccueil_menu">
                 <div>
-                    <a href="{% url 'accueil' %}#popular"><button type="button">tendance</button></a>
-                    <a href="{% url 'accueil' %}#kickstarter"><button type="button">kickstarter</button></a>
-                    <a href="{% url 'accueil' %}#ludonews"><button type="button">Arrivage ludothèque</button></a>
-                    <a href="{% url 'accueil' %}#news"><button type="button">Les News</button></a>
+                    <button type="button" onclick="link.searchById('popular')">tendance</button>
+                    <button type="button" onclick="link.searchById('kickstarter')">kickstarter</button>
+                    <button type="button" onclick="link.searchById('ludonews')">Arrivage ludothèque</button>
+                    <button type="button" onclick="link.searchById('news')">Les News</button>
                 </div>
-                <button type="button"><i class="fas fa-home"></i></button></a>
+                <button type="button"><i class="fas fa-home"></i></button>
             </div>
             <div class="ludorecherche_menu">
                 <div>
-                    <a href="{% url 'ludorecherche:index' %}"><button type="button">Derniers ajouts</button></a>
-                    <a href="{% url 'ludorecherche:search_page' %}"><button type="button">Recherche avancée</button></a>
-                    <a href="{% url 'ludorecherche:list_all' %}"><button type="button">Tous les jeux</button></a>
-                    <a href="{% url 'ludorecherche:lucky' %}"><button type="button">Tenter sa chance</button></a>
+                    <button type="button" onclick="link.goTo(link.view.ludorecherche.index)">Derniers ajouts</button>
+                    <button type="button" onclick="link.goTo(link.view.ludorecherche.searchPage)">Recherche avancée</button>
+                    <button type="button" onclick="link.goTo(link.view.ludorecherche.listAll)">Tous les jeux</button>
+                    <button type="button" onclick="link.goTo(link.view.ludorecherche.lucky)">Tenter sa chance</button>
                 </div>
                 <button type="button"><i class="fas fa-dice"></i></button>
             </div>
             <div class="ludocompte_menu">
                 <div>
-                    <a href="{% url 'ludogestion:reservation_page' %}"><button type="button" {% if not user.is_authenticated %}disabled{% endif %}>Mes réservations</button></a>
+                    <button type="button" onclick="link.goTo(link.view.ludogestion.reservationPage)"{% if not user.is_authenticated %}disabled{% endif %}>Mes réservations</button>
                     {% if not authentified %}
-                        <a href="{% url 'ludogestion:log_in_page' %}"><button type="button">Se connecter</button></a>
+                        <button type="button" onclick="link.goTo(link.view.ludogestion.logInPage)">Se connecter</button>
                     {% else %}
-                        <a href="{% url 'ludogestion:log_out' %}"><button type="button">Se déconnecter</button></a>
+                        <button type="button" onclick="link.goTo(link.view.ludogestion.logOut)">Se déconnecter</button>
                     {% endif %}
                 </div>
 
@@ -56,7 +56,7 @@
             {% if perms.ludorecherche.add_game %}
             <div class="ludogestion_menu">
                 <div>
-                    <a href="{% url 'ludogestion:find_a_game' %}"><button type="button">Ajouter un jeu</button></a>
+                    <button type="button" onclick="link.goTo(link.view.ludogestion.findAGame)">Ajouter un jeu</button>
                 </div>
                 <button type="button"><i class="fas fa-lock"></i></button>
             </div>
@@ -65,4 +65,25 @@
 
     </footer>
 </body>
+<script>
+    const link = {
+        view: {
+            ludorecherche: {
+                searchPage: "{% url 'ludorecherche:search_page' %}",
+                listAll: "{% url 'ludorecherche:list_all' %}",
+                lucky: "{% url 'ludorecherche:lucky' %}",
+                index: "{% url 'ludorecherche:index' %}",
+            },
+            ludogestion: {
+                reservationPage: "{% url 'ludogestion:reservation_page' %}",
+                logInPage: "{% url 'ludogestion:log_in_page' %}",
+                logOut: "{% url 'ludogestion:log_out' %}",
+                findAGame: "{% url 'ludogestion:find_a_game' %}",
+            },
+        },
+        searchById: (id) => window.location.href=`{% url 'accueil' %}#${id}`,
+        goTo: (view) => window.location.href=`${view}`,
+        goToAbsolute:(url) => window.location.href=url,
+    }
+</script>
 </html>
