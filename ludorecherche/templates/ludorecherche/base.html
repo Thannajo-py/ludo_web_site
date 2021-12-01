@@ -43,7 +43,7 @@
             </div>
             <div class="ludocompte_menu">
                 <div>
-                    <button type="button" onclick="link.goTo(link.view.ludogestion.reservationPage)"{% if not user.is_authenticated %}disabled{% endif %}>Mes réservations</button>
+                    <button type="button" onclick="link.goTo(link.view.ludogestion.reservationPage)" {% if not user.is_authenticated %}disabled{% endif %}>Mes réservations</button>
                     {% if not authentified %}
                         <button type="button" onclick="link.goTo(link.view.ludogestion.logInPage)">Se connecter</button>
                     {% else %}
@@ -64,26 +64,27 @@
         </div>
 
     </footer>
+    <script>
+        const link = {
+            view: {
+                ludorecherche: {
+                    searchPage: "{% url 'ludorecherche:search_page' %}",
+                    listAll: "{% url 'ludorecherche:list_all' %}",
+                    lucky: "{% url 'ludorecherche:lucky' %}",
+                    index: "{% url 'ludorecherche:index' %}",
+                },
+                ludogestion: {
+                    reservationPage: "{% url 'ludogestion:reservation_page' %}",
+                    logInPage: "{% url 'ludogestion:log_in_page' %}",
+                    logOut: "{% url 'ludogestion:log_out' %}",
+                    findAGame: "{% url 'ludogestion:find_a_game' %}",
+                },
+            },
+            searchById: (id) => window.location.href=`{% url 'accueil' %}#${id}`,
+            goTo: (view) => window.location.href=`${view}`,
+            goToAbsolute:(url) => window.location.href=url,
+        }
+    </script>
 </body>
-<script>
-    const link = {
-        view: {
-            ludorecherche: {
-                searchPage: "{% url 'ludorecherche:search_page' %}",
-                listAll: "{% url 'ludorecherche:list_all' %}",
-                lucky: "{% url 'ludorecherche:lucky' %}",
-                index: "{% url 'ludorecherche:index' %}",
-            },
-            ludogestion: {
-                reservationPage: "{% url 'ludogestion:reservation_page' %}",
-                logInPage: "{% url 'ludogestion:log_in_page' %}",
-                logOut: "{% url 'ludogestion:log_out' %}",
-                findAGame: "{% url 'ludogestion:find_a_game' %}",
-            },
-        },
-        searchById: (id) => window.location.href=`{% url 'accueil' %}#${id}`,
-        goTo: (view) => window.location.href=`${view}`,
-        goToAbsolute:(url) => window.location.href=url,
-    }
-</script>
+
 </html>
