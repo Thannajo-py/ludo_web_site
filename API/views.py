@@ -77,8 +77,8 @@ def get_last_change(timestamp, new_timestamp):
     dic_all = {'games': [
         make_sub_dic(game, {
          'by_player': game.by_player,
-         'tags': [tag.name for tag in game.tag.order_by('name')],
-         'topics': [topic.name for topic in game.topic.order_by('name')],
+         'tag': [tag.name for tag in game.tag.order_by('name')],
+         'topic': [topic.name for topic in game.topic.order_by('name')],
          'mechanism': [mechanism.name for mechanism in game.mechanism.order_by('name')],
          'add_on': [add_on.name for add_on in AddOn.objects.filter(game_id=game.pk)],
          'multi_add_on': [multi_add_on.name for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
@@ -126,9 +126,9 @@ def common_field_fill(db_class, added_content, field, type_object):
 
 
 def common_object_fill(game, new_game, type_object):
-    fill_link(game.get('designers'), Designer, new_game.designers)
-    fill_link(game.get('artists'), Artist, new_game.artists)
-    fill_link(game.get('publishers'), Publisher, new_game.publishers)
+    fill_link(game.get('designer'), Designer, new_game.designers)
+    fill_link(game.get('artist'), Artist, new_game.artists)
+    fill_link(game.get('publisher'), Publisher, new_game.publishers)
     fill_link(game.get('language'), Language, new_game.language)
     fill_link(game.get('playing_mode'), PlayingMode, new_game.playing_mode)
     if game.get('difficulty'):
@@ -138,9 +138,9 @@ def common_object_fill(game, new_game, type_object):
             new_game.difficulty = Difficulty.objects.create(name=game.get('difficulty').strip())
     if type_object == game_type():
         new_game.by_player = game.get('by_player') if type(game.get('by_player') == bool) else False
-        fill_link(game.get('tags'), Tag, new_game.tag)
+        fill_link(game.get('tag'), Tag, new_game.tag)
         fill_link(game.get('mechanism'), Mechanism, new_game.mechanism)
-        fill_link(game.get('topics'), Topic, new_game.topic)
+        fill_link(game.get('topic'), Topic, new_game.topic)
         new_game.save()
 
 
