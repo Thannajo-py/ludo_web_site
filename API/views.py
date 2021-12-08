@@ -55,7 +55,7 @@ def get_all(timestamp, new_timestamp):
          'add_on': [add_on.name for add_on in AddOn.objects.filter(game_id=game.pk)],
          'multi_add_on': [multi_add_on.name for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
          }) for game in games],
-        'multi_add_on': [make_sub_dic(add_on, {
+        'multi_add_ons': [make_sub_dic(add_on, {
                'game': [game.name for game in add_on.games.order_by('name')]
                }) for add_on in multi_add_ons],
         'add_ons': [make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None],
