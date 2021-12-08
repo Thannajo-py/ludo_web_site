@@ -105,7 +105,7 @@ def common_field_fill(db_class, added_content, field, type_object):
         if type(games) == list:
             for game in games:
                 try:
-                    db_class.objects.get(name=game.get('name').strip())
+                    db_class.objects.get(name=game.get('name', "").strip())
                     continue
                 except ObjectDoesNotExist:
                     new_game = db_class.objects.create(
@@ -113,12 +113,12 @@ def common_field_fill(db_class, added_content, field, type_object):
                         english_name=game.get("english_name", "").strip(),
                         player_min=get_int(game.get('player_min')),
                         player_max=get_int(game.get('player_max')),
-                        playing_time=game.get('playing_time').strip(),
-                        bgg_link=game.get('bgg_link').strip(),
+                        playing_time=game.get('playing_time', "").strip(),
+                        bgg_link=game.get('bgg_link', "").strip(),
                         age=get_int(game.get('age')),
                         max_time=get_int(game.get('max_playtime')),
                         stock=get_int(game.get('stock', 1)),
-                        external_image=game.get('external_img').strip(),
+                        external_image=game.get('external_img', "").strip(),
                         buying_price=get_int(game.get('buying_price')),
                     )
                     common_object_fill(game, new_game, type_object)
@@ -133,9 +133,9 @@ def common_object_fill(game, new_game, type_object):
     fill_link(game.get('playing_mode'), PlayingMode, new_game.playing_mode)
     if game.get('difficulty'):
         try:
-            new_game.difficulty = Difficulty.objects.get(name=game.get('difficulty').strip())
+            new_game.difficulty = Difficulty.objects.get(name=game.get('difficulty', "").strip())
         except ObjectDoesNotExist:
-            new_game.difficulty = Difficulty.objects.create(name=game.get('difficulty').strip())
+            new_game.difficulty = Difficulty.objects.create(name=game.get('difficulty', "").strip())
     if type_object == game_type():
         new_game.by_player = game.get('by_player') if type(game.get('by_player') == bool) else False
         fill_link(game.get('tag'), Tag, new_game.tag)
@@ -148,16 +148,16 @@ def late_common_object_fill(content):
     add_ons = content.get('add_ons')
     if type(add_ons) == list:
         for add_on in add_ons:
-            db_add_on = AddOn.objects.get(name=add_on.get('name').strip())
+            db_add_on = AddOn.objects.get(name=add_on.get('name', "").strip())
             try:
-                db_add_on.game = Game.objects.get(name=add_on.get('game').strip())
+                db_add_on.game = Game.objects.get(name=add_on.get('game', "").strip())
                 db_add_on.save()
             except ObjectDoesNotExist:
                 pass
     multi_add_ons = content.get('multi_add_ons')
     if type(multi_add_ons) == list:
         for multi_add_on in multi_add_ons:
-            db_multi_add_on = MultiAddOn.objects.get(name=multi_add_on.get('name').strip())
+            db_multi_add_on = MultiAddOn.objects.get(name=multi_add_on.get('name', "").strip())
             fill_complex_element(multi_add_on.get('games'), Game, db_multi_add_on)
 
 
@@ -213,7 +213,7 @@ def list_object_from_dict(list_object, db_class, type_object):
                 try:
                     db_data = db_class.objects.get(pk=data_object.get('id'))
                     try:
-                        db_destination = db_class.objects.get(name=data_object.get('name').strip())
+                        db_destination = db_class.objects.get(name=data_object.get('name', "").strip())
                         if db_destination.pk == db_data.pk:
                             common_field_change(db_data, data_object, type_object)
                     except ObjectDoesNotExist:
