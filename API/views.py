@@ -25,11 +25,11 @@ def make_sub_dic(game, sub_dic):
                 'player_max': game.player_max,
                 'playing_time': game.playing_time,
                 'difficulty': game.difficulty.name if game.difficulty else None,
-                'designers': [designer.name for designer in game.designers.order_by('name')],
-                'artists': [artist.name for artist in game.artists.order_by('name')],
-                'publishers': [publisher.name for publisher in game.publishers.order_by('name')],
+                'designer': [designer.name for designer in game.designers.order_by('name')],
+                'artist': [artist.name for artist in game.artists.order_by('name')],
+                'publisher': [publisher.name for publisher in game.publishers.order_by('name')],
                 'bgg_link': game.bgg_link,
-                'playing_mode': [playing_mode.name for playing_mode in game.playing_mode.order_by('name')],
+                'playingMod': [playing_mode.name for playing_mode in game.playing_mode.order_by('name')],
                 'language': [language.name for language in game.language.order_by('name')],
                 'age': game.age,
                 'buying_price': game.buying_price,
@@ -49,14 +49,14 @@ def get_all(timestamp, new_timestamp):
     dic_all = {'games': [
         make_sub_dic(game, {
          'by_player': game.by_player,
-         'tags': [tag.name for tag in game.tag.order_by('name')],
-         'topics': [topic.name for topic in game.topic.order_by('name')],
+         'tag': [tag.name for tag in game.tag.order_by('name')],
+         'topic': [topic.name for topic in game.topic.order_by('name')],
          'mechanism': [mechanism.name for mechanism in game.mechanism.order_by('name')],
          'add_on': [add_on.name for add_on in AddOn.objects.filter(game_id=game.pk)],
          'multi_add_on': [multi_add_on.name for multi_add_on in MultiAddOn.objects.filter(games=game.pk)]
          }) for game in games],
-        'multi_add_ons': [make_sub_dic(add_on, {
-               'games': [game.name for game in add_on.games.order_by('name')]
+        'multi_add_on': [make_sub_dic(add_on, {
+               'game': [game.name for game in add_on.games.order_by('name')]
                }) for add_on in multi_add_ons],
         'add_ons': [make_sub_dic(add_on, {'game': add_on.game.name}) for add_on in add_ons if add_on.game is not None],
         'timestamp': new_timestamp
