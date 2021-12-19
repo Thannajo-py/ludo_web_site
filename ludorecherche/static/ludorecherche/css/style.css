@@ -158,7 +158,7 @@ footer > div > div:hover > div > button{
 .option_button{
     width:20%;
     height:50px;
-    font-size:0.75em;
+    font-size:1.5em;
     word-break: break-word;
     border-radius:20px;
 
@@ -445,6 +445,10 @@ ul.list_game > li > a > button{
 }
 #id_name{
     height:30px;
+}
+
+#block_content{
+    padding-bottom: 2%;
 }
 .logging{
     display:flex;

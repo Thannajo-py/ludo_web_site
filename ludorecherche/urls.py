@@ -10,7 +10,8 @@ from . import views
 app_name = "ludorecherche"
 urlpatterns = [
     path('404/', views.error_404, name='error_404'),  # path for testing 404 page while debug on
-    path('500/', views.error_500, name='error_500'),  # path for testing 404 page while debug on
+    path('500/', views.error_500, name='error_500'),  # path for testing 500 page while debug on
+    path('403/', views.error_403, name='error_500'),  # path for testing 403 page while debug on
     path('', views.index, name='index'),  # ludorecherche base page
     path('list_all/', views.list_all, name='list_all'),  # ludorecherche list all page
     re_path(r'^(?P<game_pk>[0-9]+)/$', views.detail, name='detail'),  # view detail of a particular game

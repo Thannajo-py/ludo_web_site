@@ -53,12 +53,15 @@ def retrieve_game_from_api(request):  # build the answer API BGA page
     query = request.GET.get('query')
     api_answer = requests.get(f'https://api.boardgameatlas.com/api/search?name={query}&fuzzy_match=true&client_id={CLIENT_ID}')
     api_answer = json.loads(api_answer.text)
-    api_answer = api_answer['games']
-    api_answer = [GameAtlas(game['name'], game['thumb_url'], game['id']) for game in api_answer]
-    context.update({
-        'api_answer': api_answer,
-    })
-    return render(request, 'ludogestion/find_a_game.html', context)
+    if 'games' in api_answer:
+        api_answer = api_answer['games']
+        api_answer = [GameAtlas(game.get('name'), game.get('thumb_url'), game.get('id')) for game in api_answer]
+        context.update({
+            'api_answer': api_answer,
+        })
+        return render(request, 'ludogestion/find_a_game.html', context)
+    else:
+        return render(request, '500.html', context)
 
 def recall_api(type, api_answer, model):
     known = []

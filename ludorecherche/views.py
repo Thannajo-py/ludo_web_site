@@ -401,6 +401,11 @@ def handler404(request, exception):  # redirect 404 error
     return render(request, '404.html', context, status=404)
 
 
+def handler403(request, exception):  # redirect 404 error
+    context = base(request)
+    return render(request, '403.html', context, status=403)
+
+
 def handler500(request):  # redirect 500 error
     context = base(request)
     return render(request, '500.html', context, status=500)
@@ -416,3 +421,6 @@ def error_500(request):  # seeing 500 page while debug true
     return render(request, '500.html', context)
 
 
+def error_403(request):  # seeing 500 page while debug true
+    context = base(request)
+    return render(request, '403.html', context)

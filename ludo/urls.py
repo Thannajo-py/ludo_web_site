@@ -24,6 +24,7 @@ from ludoaccueil import views as view
 
 handler404 = views.handler404  # to make custom 404 page
 handler500 = views.handler500  # to make custom 500 page
+handler403 = views.handler403  # to make custom 403 page
 
 
 urlpatterns = [
