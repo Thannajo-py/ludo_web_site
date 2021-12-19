@@ -62,7 +62,8 @@ def accueil(request):  # Build the presentation page and send it back
     articles = News.objects.all()
     actual_time = time.time()
     if actual_time > last_update + 3600 * 24 :  # for speeding up the website check news only once a day
-        last_news = news('order_by=year_published&ascending=true&limit=5')
+        year = time.localtime().tm_year
+        last_news = news(f'order_by=year_published&ascending=false&limit=5&year_published={year}')
         most_popular = news('order_by=rank&ascending=true&limit=5')
         last_kickstarters = news('kickstarter=true&limit=5')
         last_update = actual_time
