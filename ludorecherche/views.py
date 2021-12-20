@@ -242,47 +242,57 @@ def get_data_or_default(expression, value, default_value):  # check if field is 
 def advanced_search(request):  # search through database for specific games with multifactorial criteria
     context = base(request)
     form = SearchAdvForm(request.POST)
-    language = get_data_or_default(form.data, 'language', "").lower()
+    language = get_data_list_or_default(form.data.getlist, 'language', "")
     query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
     difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])
     age = get_data_or_default(form.data, 'age', "")
-    age = age if age else 999
     name = get_data_or_default(form.data, 'name', "").lower()
     designer = get_data_or_default(form.data, 'designer', "").lower()
     artist = get_data_or_default(form.data, 'artist', "").lower()
     publisher = get_data_or_default(form.data, 'publisher', "").lower()
     tags = get_data_list_or_default(form.data.getlist, 'tag', [])
+    mechanisms = get_data_list_or_default(form.data.getlist, 'mechanism', [])
+    topics = get_data_list_or_default(form.data.getlist, 'topic', [])
     playing_time = get_data_or_default(form.data, 'playing_time', "")
-    time = True if playing_time else False
     player_number = get_data_or_default(form.data, 'player_number', "")
-    player = True if player_number else False
-    all_games = Game.objects.all()
-    games = []
-    # checking if add_ons change the minimum or the maximum number of player of the game
-    for game in all_games:
-        minimum_player, maximum_player = extend_number_of_player(game)
-        game_designers = " ".join([designer.name.lower() for designer in game.designers.all()])
-        game_artists = " ".join([artist.name.lower() for artist in game.artists.all()])
-        game_publishers = " ".join([publisher.name.lower() for publisher in game.publishers.all()])
-        game_languages = " ".join([language.name.lower() for language in game.language.all()])
-        # check the multi-requirement of the form
-        if name in game.name.lower()\
-                and artist in game_artists \
-                and designer in game_designers \
-                and publisher in game_publishers \
-                and all_tags_present(game, tags)\
-                and not_present_on_query_or_valid(game.difficulty, difficulty)\
-                and (not player or player and minimum_player <= int(player_number) <= maximum_player) \
-                and (not time or time and ((game.by_player and int(player_number) * game.max_time <= int(playing_time))
-                                    or (not game.by_player and game.max_time and game.max_time <= int(playing_time)))) \
-                and ((game.age and int(age) >= game.age) or not game.age)\
-                and language in game_languages \
-                and any_game_playing_mode_present(game, query_game_playing_mode):
-            games.append(game)
+    q = Game.objects.all()
+    if name:
+        q = q.filter(name__icontains=name)
+    if artist:
+        q = q.filter(artists__name__icontains=artist)
+    if designer:
+        q = q.filter(designers__name__icontains=designer)
+    if publisher:
+        q = q.filter(publishers__name__icontains=publisher)
+    if player_number:
+        q = q.filter(player_min__lte=player_number, player_max__gte=player_number)
+    if age:
+        q = q.filter(age__lte=age)
+    if language:
+        q = q.filter(language__name__in=language)
+    if query_game_playing_mode:
+        q = q.filter(playing__mode__in=query_game_playing_mode)
+    if difficulty:
+        q = q.filter(difficulty__name__in=difficulty)
+    for tag in tags:
+        q = q.filter(tag__name__icontains=tag)
+    for mechanism in mechanisms:
+        q = q.filter(mechanism__name__icontains=mechanism)
+    for topic in topics:
+        q = q.filter(topic__name__icontains=topic)
+    if playing_time.isnumeric():
+        games = []
+        for game in q:
+            if game.max_time and (
+                    game.by_player and game.player_number and game.max_time * game.player_number <= int(playing_time)
+                    or not game.by_player and game.max_time <= int(playing_time)
+            ):
+                games.append(game)
+                q = games
     title = f"Résultats pour {context['interface'].theme.query_name} avancée"
     context.update({
         'title': title,
-        'games': games,
+        'games': q,
     })
     return render(request, 'ludorecherche/search_result.html', context)
 
