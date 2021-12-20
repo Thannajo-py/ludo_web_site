@@ -244,6 +244,28 @@ def delete_dispatch(deleted_content: dict):
     delete_from_db(deleted_content.get('add_ons'), AddOn)
     delete_from_db(deleted_content.get('multi_add_ons'), MultiAddOn)
 
+def django_authentify(request, body):
+    username = body.get('login')
+    password = body.get('password')
+    return authenticate(request, username=username, password=password)
+
+def modify_db(body):
+    deleted_content = body.get('deletedList')
+    if type(deleted_content) == dict:
+        delete_dispatch(deleted_content)
+
+    modified_content = body.get('modifiedList')
+    if type(modified_content) == dict:
+        modify_dispatch(modified_content)
+
+    added_content = body.get('addedList')
+    if type(added_content) == dict:
+        add_dispatch(added_content)
+        late_common_object_fill(added_content)
+
+    if type(modified_content) == dict:
+        late_common_object_fill(modified_content)
+
 
 @api_view(['POST'])
 @transaction.atomic
@@ -252,34 +274,16 @@ def synchronize_change(request):
         body_response = json.loads(request.body)
         if type(body_response) == dict:
             body = body_response.get('body')
-            username = body.get('login')
-            password = body.get('password')
-            user = authenticate(request, username=username, password=password)
+            user = django_authentify(request, body)
             if user is not None:
                 if user.has_perm('ludorecherche.add_Game') and \
                         user.has_perm('ludorecherche.change_Game') and \
                         user.has_perm('ludorecherche.delete_Game'):
-                    deleted_content = body.get('deletedList')
-                    if type(deleted_content) == dict:
-                        delete_dispatch(deleted_content)
-
-                    modified_content = body.get('modifiedList')
-                    if type(modified_content) == dict:
-                        modify_dispatch(modified_content)
-
-                    added_content = body.get('addedList')
-                    if type(added_content) == dict:
-                        add_dispatch(added_content)
-                        late_common_object_fill(added_content)
-
-                    if type(modified_content) == dict:
-                        late_common_object_fill(modified_content)
-
+                    modify_db(body)
                 new_timestamp = time.time()
                 if body.get('timestamp') is None:
                     return Response(get_all(0.0, new_timestamp))
                 else:
                     return Response(get_last_change(body.get('timestamp'), new_timestamp))
-
             else:
                 return Response({'error': 'wrong credential'})
