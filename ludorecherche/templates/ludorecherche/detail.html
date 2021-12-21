@@ -3,10 +3,11 @@
 {% load static %}
 <h1><b>{{variable.name}}</b></h1>
     <div class="detail">
-        {% if variable.picture %}
-            <img alt="{{variable.name}}" id="detail_image" src="{% static 'ludorecherche/img/' %}{{variable.picture}}">
+        <img alt="{{variable.name}}" id="detail_image"
+            {% if variable.picture %}
+             src="{% static 'ludorecherche/img/' %}{{variable.picture}}">
         {% else %}
-            <img  id="detail_image" src="{{variable.external_image}}" alt="{{ variable.name }}">
+            src="{{variable.external_image}}">
         {% endif %}
 
         <div>
@@ -14,7 +15,7 @@
             {%else%}
                 <ul class="designer">
                 {% for designer in designers %}
-                    <li><a href="{% url 'ludorecherche:designer_game_list' designer_pk=designer.pk %}"><h3 class="designer"><i class="fas fa-user-edit"></i>: {{designer}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=designer.pk generic_type='designer' %}"><h3 class="designer"><i class="fas fa-user-edit"></i>: {{designer}}</h3></a></li>
                 {% endfor %}
                 </ul>
             {% endif %}
@@ -22,7 +23,7 @@
             {%else%}
                 <ul class="artist">
                     {% for artist in artists %}
-                    <li><a href="{% url 'ludorecherche:artist_game_list' artist_pk=artist.pk %}"><h3 class="artist"><i class="fas fa-paint-brush"></i>: {{artist}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=artist.pk generic_type='artist' %}"><h3 class="artist"><i class="fas fa-paint-brush"></i>: {{artist}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -30,7 +31,7 @@
             {%else%}
                 <ul class="publisher">
                     {% for publisher in publishers %}
-                    <li><a href="{% url 'ludorecherche:publisher_game_list' publisher_pk=publisher.pk %}"><h3 class="publisher"><i class="fas fa-paper-plane"></i>: {{publisher}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=publisher.pk generic_type='publisher' %}"><h3 class="publisher"><i class="fas fa-paper-plane"></i>: {{publisher}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -38,7 +39,7 @@
             {%else%}
                 <ul class="playing_mode">
                     {% for playing_mode in playing_modes %}
-                        <li><a href="{% url 'ludorecherche:playing_mode_game_list' playing_mode_pk=playing_mode.pk %}"><h3 class="playing_mode"><i class="fas fa-chess-knight"></i>: {{playing_mode}}</h3></a></li>
+                        <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=playing_mode.pk generic_type='playingMode' %}"><h3 class="playing_mode"><i class="fas fa-chess-knight"></i>: {{playing_mode}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -50,7 +51,7 @@
                 </ul>
             {% endif %}
             {% if variable.difficulty %}
-                <h3><i class="fas fa-signal" style="color:{{color}}"></i>: {{variable.difficulty.name}} </h3>
+                <h3><i class="fas fa-signal" style="color:{{color}};"></i>: {{variable.difficulty.name}} </h3>
             {% endif %}
             {% if variable.player_min and variable.player_max %}
                 <h3><i class="fas fa-users"></i>: de {{variable.player_min}} à {{variable.player_max}} joueurs</h3>
@@ -130,7 +131,7 @@
             {%else%}
                 <ul class="tag">
                     {% for tag in tags %}
-                        <li><a href="{% url 'ludorecherche:tag_game_list' tag_pk=tag.pk %}" ><h3 class="tag"><i class="fas fa-tags"></i>: {{tag}}</h3></a></li>
+                        <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=tag.pk generic_type='tag' %}" ><h3 class="tag"><i class="fas fa-tags"></i>: {{tag}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -138,7 +139,7 @@
             {%else%}
                 <ul class="tag">
                     {% for topic in topics %}
-                        <li><a href="{% url 'ludorecherche:topic_game_list' topic_pk=topic.pk %}" ><h3 class="tag"><i class="fab fa-affiliatetheme"></i>: {{topic}}</h3></a></li>
+                        <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=topic.pk generic_type='topic' %}" ><h3 class="tag"><i class="fab fa-affiliatetheme"></i>: {{topic}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -146,7 +147,7 @@
             {%else%}
                 <ul class="tag">
                     {% for mechanism in mechanisms %}
-                        <li><a href="{% url 'ludorecherche:mechanism_game_list' mechanism_pk=mechanism.pk %}" ><h3 class="tag"><i class="fas fa-cog"></i>: {{mechanism}}</h3></a></li>
+                        <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=mechanism.pk generic_type='mechanism' %}" ><h3 class="tag"><i class="fas fa-cog"></i>: {{mechanism}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}

@@ -3,6 +3,7 @@ from random import randint
 from django.shortcuts import render, get_object_or_404
 
 
+import ludorecherche.models as models
 from .models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, PlayingMode, Tag, Topic,\
     Mechanism, Language, Background
 from ludoaccueil.models import Comment
@@ -24,7 +25,8 @@ def base(request):  # give the basic context of each page
         'form': form,
     }
     return context
-# Create your views here.
+
+
 def index(request):
     context = base(request)
     games = Game.objects.order_by('-created_at')[:12]
@@ -68,18 +70,15 @@ def detail(request, game_pk):  # Game detail
     multi_add_ons = [multi_add_on for multi_add_on in game.multi_add_ons.all()]
     context = common_detail(game, context)
     add_ons = AddOn.objects.filter(game__name__icontains=game.name)
-    comments = Comment.objects.filter(game__name__icontains=game.name)
     tags = [tag for tag in game.tag.all()]
     topics = [topic for topic in game.topic.all()]
     mechanisms = [mechanism for mechanism in game.mechanism.all()]
-    reserved = Reservation.objects.filter(game=game_pk)
-    stock = game.stock - len(reserved)
-    # give the difficulty symbol his color
-    if game.difficulty:
-        color = 'green' if game.difficulty.name.lower() in ['famille', 'ambiance'] \
-            else 'orange' if game.difficulty.name.lower() in ['vétéran'] else 'red'
-    else:
-        color = 'blue'
+    comments, stock, color = game_type_common_part(
+        {'game__name__icontains': game.name},
+        {'game': game_pk},
+        game,
+        game.difficulty
+    )
     context.update({
         'variable': game,
         'color': color,
@@ -100,24 +99,35 @@ def add_on_detail(request, add_on_pk):
     add_on = get_object_or_404(AddOn, pk=add_on_pk)
     context = common_detail(add_on, context)
     game = add_on.game
-    comments = Comment.objects.filter(add_on__name__icontains=add_on.name)
-    reserved = Reservation.objects.filter(addon=add_on_pk)
-    stock = game.stock - len(reserved)
-    # give the difficulty symbol his color
-    if add_on.difficulty:
-        color = 'green' if add_on.difficulty.name.lower() in ['famille', 'ambiance'] else 'orange'\
-            if add_on.difficulty.name.lower() in ['vétéran'] else 'red'
-    else:
-        color = 'blue'
+    comments, stock, color = game_type_common_part(
+        {'add_on__name__icontains': add_on.name},
+        {'addon': add_on_pk},
+        add_on.stock,
+        add_on.difficulty
+    )
     context.update({
         'variable': add_on,
         'color': color,
         'link_game': game,
         'type': 'addon',
         'comments': comments,
-        'stock':stock
+        'stock': stock
     })
     return render(request, 'ludorecherche/detail.html', context)
+
+
+def game_type_common_part(comments_kwargs, reserved_kwargs, game, difficulty):
+    comments = Comment.objects.filter(**comments_kwargs)
+    reserved = Reservation.objects.filter(**reserved_kwargs)
+    stock = game.stock - len(reserved)
+    # give the difficulty symbol his color
+    if difficulty:
+        color = 'green' if difficulty.name.lower() in ['famille', 'ambiance'] else 'orange'\
+            if difficulty.name.lower() in ['vétéran'] else 'red'
+    else:
+        color = 'blue'
+
+    return comments, stock, color
 
 
 def lucky(request):
@@ -242,53 +252,24 @@ def get_data_or_default(expression, value, default_value):  # check if field is 
 def advanced_search(request):  # search through database for specific games with multifactorial criteria
     context = base(request)
     form = SearchAdvForm(request.POST)
-    language = get_data_list_or_default(form.data.getlist, 'language', "")
-    query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
-    difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])
-    age = get_data_or_default(form.data, 'age', "")
-    name = get_data_or_default(form.data, 'name', "").lower()
-    designer = get_data_or_default(form.data, 'designer', "").lower()
-    artist = get_data_or_default(form.data, 'artist', "").lower()
-    publisher = get_data_or_default(form.data, 'publisher', "").lower()
-    tags = get_data_list_or_default(form.data.getlist, 'tag', [])
-    mechanisms = get_data_list_or_default(form.data.getlist, 'mechanism', [])
-    topics = get_data_list_or_default(form.data.getlist, 'topic', [])
     playing_time = get_data_or_default(form.data, 'playing_time', "")
     player_number = get_data_or_default(form.data, 'player_number', "")
-    q = Game.objects.all()
-    if name:
-        q = q.filter(name__icontains=name)
-    if artist:
-        q = q.filter(artists__name__icontains=artist)
-    if designer:
-        q = q.filter(designers__name__icontains=designer)
-    if publisher:
-        q = q.filter(publishers__name__icontains=publisher)
-    if player_number:
-        q = q.filter(player_min__lte=player_number, player_max__gte=player_number)
-    if age:
-        q = q.filter(age__lte=age)
-    if language:
-        q = q.filter(language__name__in=language)
-    if query_game_playing_mode:
-        q = q.filter(playing__mode__in=query_game_playing_mode)
-    if difficulty:
-        q = q.filter(difficulty__name__in=difficulty)
+    tags = get_data_list_or_default(form.data.getlist, 'tag', [])
+    topics = get_data_list_or_default(form.data.getlist, 'topic', [])
+    mechanisms = get_data_list_or_default(form.data.getlist, 'mechanism', [])
+    q_dict_kwargs = query_dict_kwargs(form, playing_time, player_number)
+    q = Game.objects.filter(**q_dict_kwargs) if q_dict_kwargs else Game.objects.all()
     for tag in tags:
         q = q.filter(tag__name__icontains=tag)
-    for mechanism in mechanisms:
+    for mechanism in  mechanisms:
         q = q.filter(mechanism__name__icontains=mechanism)
     for topic in topics:
         q = q.filter(topic__name__icontains=topic)
     if playing_time.isnumeric():
-        games = []
-        for game in q:
-            if game.max_time and (
-                    game.by_player and game.player_number and game.max_time * game.player_number <= int(playing_time)
-                    or not game.by_player and game.max_time <= int(playing_time)
-            ):
-                games.append(game)
-                q = games
+        q = q.exclude(by_player=False, max_time__gt=int(playing_time))
+        if player_number.isnumeric():
+            q = q.exclude(by_player=True, max_time__gt=int(playing_time) / int(player_number))
+
     title = f"Résultats pour {context['interface'].theme.query_name} avancée"
     context.update({
         'title': title,
@@ -297,20 +278,55 @@ def advanced_search(request):  # search through database for specific games with
     return render(request, 'ludorecherche/search_result.html', context)
 
 
+def query_dict_kwargs(form, playing_time, player_number):
+    language = get_data_list_or_default(form.data.getlist, 'language', "")
+    query_game_playing_mode = get_data_list_or_default(form.data.getlist, 'playing_mode_choice', [])
+    difficulty = get_data_list_or_default(form.data.getlist, 'difficulty', [])
+    age = get_data_or_default(form.data, 'age', "")
+    name = get_data_or_default(form.data, 'name', "").lower()
+    designer = get_data_or_default(form.data, 'designer', "").lower()
+    artist = get_data_or_default(form.data, 'artist', "").lower()
+    publisher = get_data_or_default(form.data, 'publisher', "").lower()
+    q_dict_kwargs = {}
+    if name:
+        q_dict_kwargs['name__icontains'] = name
+    if artist:
+        q_dict_kwargs['artist__name__icontains'] = artist
+    if designer:
+        q_dict_kwargs['deisgners__name__icontains'] = designer
+    if publisher:
+        q_dict_kwargs['publishers__name__icontains'] = publisher
+    if player_number.isnumeric():
+        q_dict_kwargs['player_max__isnull'] = False
+        q_dict_kwargs['player_min__lte'] = player_number
+        q_dict_kwargs['player_max__gte'] = player_number
+    if age.isnumeric():
+        q_dict_kwargs['age__isnull'] = False
+        q_dict_kwargs['age__lte'] = age
+    if language:
+        q_dict_kwargs['language_name__in'] = language
+    if query_game_playing_mode:
+        q_dict_kwargs['playing__mode__in'] = query_game_playing_mode
+    if difficulty:
+        q_dict_kwargs['difficulty__name__in'] = difficulty
+    if playing_time.isnumeric():
+        q_dict_kwargs['max_time__isnull'] = False
+        if not player_number.isnumeric():
+            q_dict_kwargs['by_player'] = False
+    return q_dict_kwargs
+
+
 def multi_add_on_detail(request, multi_add_on_pk):
     context = base(request)
     multi_add_on = get_object_or_404(MultiAddOn, pk=multi_add_on_pk)
     context = common_detail(multi_add_on, context)
     games = [game for game in multi_add_on.games.all()]
-    comments = Comment.objects.filter(multi_add_on__name__icontains=multi_add_on.name)
-    reserved = Reservation.objects.filter(multiaddon=multi_add_on_pk)
-    stock = multi_add_on.stock - len(reserved)
-    # give the difficulty symbol his color
-    if multi_add_on.difficulty:
-        color = 'green' if multi_add_on.difficulty.name.lower() in ['famille', 'ambiance'] \
-            else 'orange' if multi_add_on.difficulty.name.lower() in ['vétéran'] else 'red'
-    else:
-        color = 'blue'
+    comments, stock, color = game_type_common_part(
+        {'multi_add_on__name__icontains': multi_add_on.name},
+        {'multiaddon': multi_add_on_pk},
+        multi_add_on.stock,
+        multi_add_on.difficulty
+    )
     context.update({
         'variable': multi_add_on,
         'color': color,
@@ -322,88 +338,21 @@ def multi_add_on_detail(request, multi_add_on_pk):
     return render(request, 'ludorecherche/detail.html', context)
 
 
-def designer_game_list(request, designer_pk):
+def generic_game_list(request, generic_type, generic_pk):
     context = base(request)
-    designer = get_object_or_404(Designer, pk=designer_pk)
-    games = Game.objects.filter(designers=designer)
-    title = f"Liste des jeux de {designer.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def artist_game_list(request, artist_pk):
-    context = base(request)
-    artist = get_object_or_404(Artist, pk=artist_pk)
-    games = Game.objects.filter(artists=artist)
-    title = f"Liste des jeux illustrés {artist.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def publisher_game_list(request, publisher_pk):
-    context = base(request)
-    publisher = get_object_or_404(Publisher, pk=publisher_pk)
-    games = Game.objects.filter(publishers=publisher)
-    title = f"Liste des jeux publiés par {publisher.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def playing_mode_game_list(request, playing_mode_pk):
-    context = base (request)
-    playing_mode = get_object_or_404(PlayingMode, pk=playing_mode_pk)
-    games = Game.objects.filter(playing_mode=playing_mode)
-    title = f"Liste des jeux de type {playing_mode.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def tag_game_list(request, tag_pk):
-    context = base(request)
-    tag = get_object_or_404(Tag, pk=tag_pk)
-    games = Game.objects.filter(tag=tag)
-    title = f"Liste des jeux contenant l'étiquette {tag.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def topic_game_list(request, topic_pk):
-    context = base(request)
-    topic = get_object_or_404(Topic, pk=topic_pk)
-    games = Game.objects.filter(topic=topic)
-    title = f"Liste des jeux contenant l'étiquette {topic.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
-
-
-def mechanism_game_list(request, mechanism_pk):
-    context = base(request)
-    mechanism = get_object_or_404(Mechanism, pk=mechanism_pk)
-    games = Game.objects.filter(mechanism=mechanism)
-    title = f"Liste des jeux contenant l'étiquette {mechanism.name}"
-    context.update({
-        'games': games,
-        'title': title,
-    })
-    return render(request, 'ludorecherche/search_result.html', context)
+    model_name = generic_type.capitalize() if generic_type != 'playingMode' else 'PlayingMode'
+    if hasattr(models, model_name):
+        model = getattr(models, model_name)
+        key = get_object_or_404(model, pk=generic_pk)
+        attr_name = generic_type if generic_type != 'playingMode' else 'playing_mode'
+        games = Game.objects.filter(**{attr_name: key})
+        title = f"Liste des jeux publiés par {key.name}"
+        context.update({
+            'games': games,
+            'title': title,
+        })
+        return render(request, 'ludorecherche/search_result.html', context)
+    return render(request, '404.html', context)
 
 
 def handler404(request, exception):  # redirect 404 error
