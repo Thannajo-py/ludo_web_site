@@ -340,7 +340,7 @@ def multi_add_on_detail(request, multi_add_on_pk):
 
 def generic_game_list(request, generic_type, generic_pk):
     context = base(request)
-    model_name = generic_type.capitalize() if generic_type != 'playingMode' else 'PlayingMode'
+    model_name = generic_type.capitalize().rstrip("s") if generic_type != 'playingMode' else 'PlayingMode'
     if hasattr(models, model_name):
         model = getattr(models, model_name)
         key = get_object_or_404(model, pk=generic_pk)

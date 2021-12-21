@@ -15,7 +15,7 @@
             {%else%}
                 <ul class="designer">
                 {% for designer in designers %}
-                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=designer.pk generic_type='designer' %}"><h3 class="designer"><i class="fas fa-user-edit"></i>: {{designer}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=designer.pk generic_type='designers' %}"><h3 class="designer"><i class="fas fa-user-edit"></i>: {{designer}}</h3></a></li>
                 {% endfor %}
                 </ul>
             {% endif %}
@@ -23,7 +23,7 @@
             {%else%}
                 <ul class="artist">
                     {% for artist in artists %}
-                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=artist.pk generic_type='artist' %}"><h3 class="artist"><i class="fas fa-paint-brush"></i>: {{artist}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=artist.pk generic_type='artists' %}"><h3 class="artist"><i class="fas fa-paint-brush"></i>: {{artist}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -31,7 +31,7 @@
             {%else%}
                 <ul class="publisher">
                     {% for publisher in publishers %}
-                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=publisher.pk generic_type='publisher' %}"><h3 class="publisher"><i class="fas fa-paper-plane"></i>: {{publisher}}</h3></a></li>
+                    <li><a href="{% url 'ludorecherche:generic_game_list' generic_pk=publisher.pk generic_type='publishers' %}"><h3 class="publisher"><i class="fas fa-paper-plane"></i>: {{publisher}}</h3></a></li>
                     {% endfor %}
                 </ul>
             {% endif %}
