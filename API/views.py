@@ -1,5 +1,6 @@
 import json
 import time
+import os
 
 
 from django.contrib.auth import authenticate
@@ -292,7 +293,7 @@ def django_authentify(request, body):
 
 
 def decrypt(text):
-    secret_key = "L66Fyiqhc49VzYthTsSGhmZlxnUz-S3YYBEz39o3_eE"
+    secret_key = os.environ['fil_rouge_secret_crypto_key']
     result = ""
     for i in range(len(text)):
         result += chr(text[i] - ord(secret_key[i % len(secret_key)]))
