@@ -9,6 +9,8 @@ from django.db import transaction
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import AuthenticationFailed
+
 
 from ludorecherche.models import Game, AddOn, MultiAddOn, Designer, Artist, Publisher, Language, PlayingMode, \
     Difficulty, Tag, Mechanism, Topic, DeletedGames
@@ -340,4 +342,4 @@ def synchronize_change(request):
                 else:
                     return Response(get_last_change(body.get('timestamp'), new_timestamp))
             else:
-                return Response({'error': 'wrong credential'})
+                raise AuthenticationFailed
