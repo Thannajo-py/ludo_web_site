@@ -298,7 +298,10 @@ def decrypt(text):
     secret_key = os.environ['fil_rouge_secret_crypto_key']
     result = ""
     for i in range(len(text)):
-        result += chr(text[i] - ord(secret_key[i % len(secret_key)]))
+        if type(text[i]) == int:
+            result += chr(text[i] - ord(secret_key[i % len(secret_key)]))
+        else:
+            return None
     return result
 
 
