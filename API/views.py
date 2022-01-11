@@ -294,12 +294,14 @@ def django_authentify(request, body):
     return authenticate(request, username=username, password=password)
 
 
-def decrypt(text):
+def decrypt(int_list):
+    if type(int_list) != list:
+        return None
     secret_key = os.environ['fil_rouge_secret_crypto_key']
     result = ""
-    for i in range(len(text)):
-        if type(text[i]) == int:
-            result += chr(text[i] - ord(secret_key[i % len(secret_key)]))
+    for i in range(len(int_list)):
+        if type(int_list[i]) == int:
+            result += chr(int_list[i] - ord(secret_key[i % len(secret_key)]))
         else:
             return None
     return result
